@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Category Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], textarea, input[type="file"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .image-preview {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ category.id|yesno:"Edit Category,Add Category" }}</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>
+                <label for="category_name">Category Name:</label>
+                <input type="text" name="category_name" id="category_name" value="{{ category.category_name }}">
+            </p>
+            <p>
+                <label for="slug">Slug:</label>
+                <input type="text" name="slug" id="slug" value="{{ category.slug }}">
+            </p>
+            <p>
+                <label for="description">Description:</label>
+                <textarea name="description" id="description">{{ category.description }}</textarea>
+            </p>
+            <p>
+                <label for="cat_image">Category Image:</label>
+                <input type="file" name="cat_image" id="cat_image">
+                {% if category.cat_image %}
+                    <div class="image-preview">
+                        <img src="{{ category.cat_image.url }}" alt="{{ category.category_name }}">
+                    </div>
+                {% endif %}
+            </p>
+            <button type="submit">Save</button>
+        </form>
+        <a href="{% url 'category:category_list' %}">Back to list</a>
+    </div>
+</body>
+</html>
