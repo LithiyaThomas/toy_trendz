@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product List</title>
+</head>
+<body>
+    <h1>Products</h1>
+    <a href="{% url 'product:product_create' %}">Create Product</a>
+    <ul>
+        {% for product in products %}
+        <li>
+            {{ product.product_name }}
+            <a href="{% url 'product:product_update' product.id %}">Edit</a>
+            <a href="{% url 'product:product_delete' product.id %}">Delete</a>
+            <a href="{% url 'product:product_variant_list' product.id %}">View Variants</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

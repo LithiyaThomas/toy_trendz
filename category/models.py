@@ -1,9 +1,11 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+from PIL import Image
 
-
-# Create your models here.
+class CategoryManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50, unique=True)
@@ -31,13 +33,19 @@ class Category(models.Model):
     def permanent_delete(self):
         super(Category, self).delete()
 
-    objects = models.Manager()
-    available_objects = models.Manager()  # For retrieving non-deleted items
+    objects = models.Manager()  # Default manager
+    available_objects = CategoryManager()  # Custom manager for non-deleted items
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.category_name)
         super(Category, self).save(*args, **kwargs)
+        if self.cat_image:
+            img = Image.open(self.cat_image.path)
+            if img.height > 300 or img.width > 300:
+                output_size = (300, 300)
+                img.thumbnail(output_size)
+                img.save(self.cat_image.path)
 
     def __str__(self):
         return self.category_name

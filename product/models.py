@@ -7,7 +7,6 @@ from PIL import Image
 from category.models import Category
 from brand.models import Brand
 
-
 class Type(models.Model):
     name = models.CharField(max_length=100)
     is_deleted = models.BooleanField(default=False)
@@ -26,16 +25,20 @@ class Type(models.Model):
     def __str__(self):
         return self.name
 
-
 class Product(models.Model):
     product_name = models.CharField(max_length=200, unique=True)
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
     description = models.TextField(max_length=500, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, related_name='brand_products', on_delete=models.CASCADE)
     product_type = models.ForeignKey(Type, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'product'
+        verbose_name_plural = 'product'
+        ordering = ['-id']
 
     def get_url(self):
         return reverse('product_detail', args=[self.category.slug, self.slug])
@@ -62,16 +65,13 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
-
 def validate_price_within_range(value):
     if not (0 <= value <= ProductVariant.MAX_PRICE):
         raise ValidationError(f'Price must be between 0 and {ProductVariant.MAX_PRICE}.')
 
-
 def validate_stock_within_range(value):
     if not (0 <= value <= ProductVariant.MAX_STOCK):
         raise ValidationError(f'Stock must be between 0 and {ProductVariant.MAX_STOCK}.')
-
 
 class ProductVariant(models.Model):
     MAX_PRICE = 1000
@@ -108,7 +108,6 @@ class ProductVariant(models.Model):
     def __str__(self):
         return self.name
 
-
 class ProductImage(models.Model):
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='photos/productvariant')
@@ -135,7 +134,6 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.variant.name}"
-
 
 class Review(models.Model):
     RATING_CHOICES = [

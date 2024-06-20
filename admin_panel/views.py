@@ -80,3 +80,7 @@ def admin_logout(request):
     else:
         logger.debug("No admin session found to log out")
     return redirect('admin-login')
+
+def admin_dashboard(request):
+
+    return render(request, 'adminside/dashboard.html')
