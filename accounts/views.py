@@ -23,7 +23,8 @@ def user_login(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect(settings.LOGIN_REDIRECT_URL)  # Use the LOGIN_REDIRECT_URL from settings
+                return redirect('home')
+                # return redirect(settings.LOGIN_REDIRECT_URL) # Use the LOGIN_REDIRECT_URL from settings
             else:
                 form.add_error(None, 'Invalid email or password')
     else:
@@ -38,13 +39,14 @@ def user_register(request):
             user = form.save(commit=False)
             user.is_active = False  # Deactivate account until it is confirmed
             user.save()
-
             otp = generate_otp()
             send_mail(
                 "Your OTP Code",
                 f"Your OTP code is {otp}",
                 settings.DEFAULT_FROM_EMAIL,
                 [user.email],
+
+
             )
             # Store the OTP in the session
             request.session['otp'] = str(otp)
@@ -106,4 +108,5 @@ def verify_otp(request):
 
 # Home view
 def home(request):
+
     return render(request, 'accounts/home.html')

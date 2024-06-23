@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{% if variant %}Update{% else %}Create{% endif %} Product Variant</title>
+    <title>Add Variant</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f4f4f9;
             margin: 0;
             padding: 0;
             display: flex;
@@ -14,71 +13,140 @@
             align-items: center;
             height: 100vh;
         }
-        .form-container {
-            background-color: #fff;
+
+        .container {
+            background-color: #ffffff;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
         }
+
         h1 {
-            margin-bottom: 20px;
             font-size: 24px;
+            margin-bottom: 20px;
             text-align: center;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
+
         input[type="text"],
         input[type="number"],
-        textarea,
-        select {
+        input[type="color"] {
             width: calc(100% - 20px);
-            padding: 8px 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            box-sizing: border-box;
+            background-color: #f9f9f9;
         }
+
         input[type="checkbox"] {
-            margin-bottom: 15px;
+            width: auto;
+            margin-right: 10px;
         }
-        button {
+
+        .color-code-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .input-with-color {
+            display: flex;
+            align-items: center;
+            width: calc(100% - 20px);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .input-with-color input[type="text"] {
+            border: none;
+            flex-grow: 1;
+            padding: 12px;
+            background-color: transparent;
+        }
+
+        .input-with-color .color-box {
+            width: 70px;
+            height: 70px;
+            margin-left: 10px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-with-color input[type="color"] {
             width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #28a745;
             color: white;
             border: none;
+            padding: 12px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            width: 100%;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>{% if variant %}Update{% else %}Create{% endif %} Product Variant</h1>
+    <div class="container">
+        <h1>Add Variant for Product {{ product_id }}</h1>
         <form method="post">
             {% csrf_token %}
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" value="{{ variant.name|default:'' }}"><br>
+            <label for="colour_name">Colour Name:</label>
+            <input type="text" name="colour_name" id="colour_name" value="{% if view.object %}{{ view.object.colour_name }}{% endif %}">
 
-            <label for="price">Price:</label>
-            <input type="number" step="0.01" id="price" name="price" value="{{ variant.price|default:'' }}"><br>
+            <label for="variant_stock">Variant Stock:</label>
+            <input type="number" name="variant_stock" id="variant_stock" value="{% if view.object and view.object.variant_stock > 0 %}{{ view.object.variant_stock }}{% endif %}" min="1" required>
 
-            <label for="stock">Stock:</label>
-            <input type="number" id="stock" name="stock" value="{{ variant.stock|default:'' }}"><br>
+            <label for="variant_status">Variant Status:</label>
+            <input type="checkbox" name="variant_status" id="variant_status" {% if view.object and view.object.variant_status %}checked{% endif %}>
 
-            <label for="is_active">Active:</label>
-            <input type="checkbox" id="is_active" name="is_active" {% if variant and variant.is_active %}checked{% endif %}><br>
+            <label for="colour_code">Colour Code:</label>
+            <div class="color-code-wrapper">
+                <div class="input-with-color">
+                    <input type="text" name="colour_code" id="colour_code" value="{% if view.object %}{{ view.object.colour_code }}{% endif %}" readonly>
+                    <div class="color-box">
+                        <input type="color" id="colorPicker" value="{% if view.object %}{{ view.object.colour_code }}{% endif %}" onchange="updateColorBox(this.value)">
+                    </div>
+                </div>
+            </div>
 
-            <button type="submit">{% if variant %}Update{% else %}Create{% endif %}</button>
+            <button type="submit">Save</button>
         </form>
     </div>
+    <script>
+        function updateColorBox(color) {
+            document.getElementById('colour_code').value = color;
+        }
+
+        // Initialize color box if there's a pre-existing color
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const colorInput = document.getElementById('colorPicker');
+            updateColorBox(colorInput.value);
+        });
+    </script>
 </body>
 </html>

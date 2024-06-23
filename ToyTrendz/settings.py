@@ -77,7 +77,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 AUTHENTICATION_BACKENDS = [
     'accounts.backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',  # Keep the default backend
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Database
@@ -146,34 +146,4 @@ DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
-
-LOGIN_URL = 'user-login'  # Default user login URL
-ADMIN_LOGIN_REDIRECT_URL = 'user_data'  # Admin home page after login
-
-# Admin credentials
-ADMIN_USERNAME = config('ADMIN_USERNAME')
-ADMIN_PASSWORD = config('ADMIN_PASSWORD')
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        '': {  # root logger
-            'handlers': ['file'],
-            'level': 'DEBUG',
-        },
-    },
-}
 

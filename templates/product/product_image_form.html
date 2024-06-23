@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Image</title>
+</head>
+<body>
+    <h1>Add Image for Product {{ product_id }}</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="image">Image:</label>
+        <input type="file" name="image" id="image">
+
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>

@@ -1,118 +1,105 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, ProductVariant
-from category.models import Category
-from brand.models import Brand
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Product, ProductVariant, ProductImage, Category, Brand
+from .forms import ProductForm, ProductVariantForm, ProductImageForm
+from django.shortcuts import get_object_or_404
 
-def product_list(request):
-    products = Product.objects.filter(is_deleted=False)
-    return render(request, 'product/product_list.html', {'product': products})
+# Product ListView
+class ProductListView(ListView):
+    model = Product
+    template_name = 'product/product_list.html'
+    context_object_name = 'products'
 
+    def get_queryset(self):
+        return Product.objects.select_related('product_category', 'product_brand').all()
 
-def product_create(request):
-    if request.method == 'POST':
-        product_name = request.POST.get('product_name')
-        description = request.POST.get('description')
-        category_id = request.POST.get('category')
-        brand_id = request.POST.get('brand')
-        featured = 'featured' in request.POST
+# Product CreateView
+class ProductCreateView(CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'product/product_form.html'
+    success_url = reverse_lazy('product_list')
 
-        category = Category.objects.get(id=category_id)
-        brand = Brand.objects.get(id=brand_id)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['brands'] = Brand.objects.all()
+        return context
 
-        product = Product(
-            product_name=product_name,
-            description=description,
-            category=category,
-            brand=brand,
-            featured=featured
-        )
-        product.save()
-        return redirect('product_list')
+# Product UpdateView
+class ProductUpdateView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'product/product_form.html'
+    success_url = reverse_lazy('product_list')
 
-    categories = Category.available_objects.all()
-    brands = Brand.available_objects.all()
-    return render(request, 'product/product_form.html', {
-        'categories': categories,
-        'brands': brands
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['brands'] = Brand.objects.all()
+        return context
 
-def product_update(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    if request.method == 'POST':
-        product.product_name = request.POST.get('product_name')
-        product.description = request.POST.get('description')
-        product.category = get_object_or_404(Category, id=request.POST.get('category'))
-        product.brand = get_object_or_404(Brand, id=request.POST.get('brand'))
-        product.featured = request.POST.get('featured', False) == 'on'
+    def get_queryset(self):
+        return Product.objects.select_related('product_category', 'product_brand').all()
 
-        product.save()
-        return redirect('product:product_list')
+# Product DeleteView
+class ProductDeleteView(DeleteView):
+    model = Product
+    template_name = 'product/product_confirm_delete.html'
+    success_url = reverse_lazy('product_list')
 
-    categories = Category.available_objects.all()
-    brands = Brand.available_objects.all()
-    return render(request, 'product/product_form.html', {
-        'product': product,
-        'categories': categories,
-        'brands': brands,
-    })
+# Product Variant CreateView
+class ProductVariantCreateView(CreateView):
+    model = ProductVariant
+    form_class = ProductVariantForm
+    template_name = 'product/product_variant_form.html'
 
-def product_delete(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    product.soft_delete()
-    return redirect('product:product_list')
+    def get_success_url(self):
+        return reverse_lazy('product_variants', kwargs={'product_id': self.kwargs['product_id']})
 
-def product_restore(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    product.restore()
-    return redirect('product:product_list')
+    def form_valid(self, form):
+        form.instance.product_id = self.kwargs['product_id']
+        return super().form_valid(form)
 
-def product_variant_list(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    variants = product.variants.filter(is_deleted=False)
-    return render(request, 'product/product_variant_list.html', {'product': product, 'variants': variants})
+# Product Variant UpdateView
+class ProductVariantUpdateView(UpdateView):
+    model = ProductVariant
+    form_class = ProductVariantForm
+    template_name = 'product/product_variant_form.html'
 
-def product_variant_create(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        price = request.POST.get('price')
-        stock = request.POST.get('stock')
-        is_active = request.POST.get('is_active', False) == 'on'
+    def get_success_url(self):
+        return reverse_lazy('product_variants', kwargs={'product_id': self.object.product_id})
 
-        variant = ProductVariant(
-            product=product,
-            name=name,
-            price=price,
-            stock=stock,
-            is_active=is_active
-        )
-        variant.save()
-        return redirect('product:product_variant_list', product_id=product.id)
+# Product Variant DeleteView
+class ProductVariantDeleteView(DeleteView):
+    model = ProductVariant
+    template_name = 'product/product_variant_confirm_delete.html'
 
-    return render(request, 'product/product_variant_form.html', {'product': product})
+    def get_success_url(self):
+        return reverse_lazy('product_variants', kwargs={'product_id': self.object.product_id})
 
-def product_variant_update(request, product_id, pk):
-    product = get_object_or_404(Product, pk=product_id)
-    variant = get_object_or_404(ProductVariant, pk=pk)
-    if request.method == 'POST':
-        variant.name = request.POST.get('name')
-        variant.price = request.POST.get('price')
-        variant.stock = request.POST.get('stock')
-        variant.is_active = request.POST.get('is_active', False) == 'on'
+# Product Image CreateView
+class ProductImageCreateView(CreateView):
+    model = ProductImage
+    form_class = ProductImageForm
+    template_name = 'product/product_image_form.html'
+    success_url = reverse_lazy('product_list')
 
-        variant.save()
-        return redirect('product:product_variant_list', product_id=product.id)
+    def form_valid(self, form):
+        form.instance.product_id = self.kwargs['product_id']
+        return super().form_valid(form)
 
-    return render(request, 'product/product_variant_form.html', {'product': product, 'variant': variant})
+class ProductVariantListView(ListView):
+    model = ProductVariant
+    template_name = 'product/product_variant_list.html'
+    context_object_name = 'product_variants'
 
-def product_variant_delete(request, product_id, pk):
-    product = get_object_or_404(Product, pk=product_id)
-    variant = get_object_or_404(ProductVariant, pk=pk)
-    variant.soft_delete()
-    return redirect('product:product_variant_list', product_id=product.id)
+    def get_queryset(self):
+        product_id = self.kwargs['product_id']
+        self.product = get_object_or_404(Product, pk=product_id)
+        return ProductVariant.objects.filter(product=self.product)
 
-def product_variant_restore(request, product_id, pk):
-    product = get_object_or_404(Product, pk=product_id)
-    variant = get_object_or_404(ProductVariant, pk=pk)
-    variant.restore()
-    return redirect('product:product_variant_list', product_id=product.id)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        return context

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ product.product_name }}</title>
+</head>
+<body>
+    <h1>{{ product.product_name }}</h1>
+    <p>{{ product.product_description }}</p>
+    <p>Category: {{ product.product_category }}</p>
+    <p>Brand: {{ product.product_brand }}</p>
+    <p>Price: {{ product.price }}</p>
+    <p>Offer Price: {{ product.offer_price }}</p>
+    {% if product.thumbnail %}
+        <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }}">
+    {% endif %}
+    <p>Discount: {{ product.percentage_discount }}%</p>
+    <a href="{% url 'product_update' product.pk %}">Edit</a>
+    <a href="{% url 'product_delete' product.pk %}">Delete</a>
+    <a href="{% url 'product_variant_create' product.pk %}">Add Variant</a>
+    <a href="{% url 'product_image_create' product.pk %}">Add Image</a>
+</body>
+</html>

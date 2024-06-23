@@ -1,20 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Product Variants</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f9;
+        }
+
+        .btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>Variants for {{ product.product_name }}</h1>
-    <a href="{% url 'product:product_variant_create' product.id %}">Create Variant</a>
-    <ul>
-        {% for variant in variants %}
-        <li>
-            {{ variant.name }} - {{ variant.price }} - {{ variant.stock }}
-            <a href="{% url 'product:product_variant_update' product.id variant.id %}">Edit</a>
-            <a href="{% url 'product:product_variant_delete' product.id variant.id %}">Delete</a>
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <h1>Product Variants for {{ product.product_name }}</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Colour Name</th>
+                    <th>Variant Stock</th>
+                    <th>Variant Status</th>
+                    <th>Colour Code</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for variant in product_variants %}
+                    <tr>
+                        <td>{{ variant.id }}</td>
+                        <td>{{ variant.colour_name }}</td>
+                        <td>{{ variant.variant_stock }}</td>
+                        <td>{{ variant.variant_status }}</td>
+                        <td>
+                            <div style="background-color: {{ variant.colour_code }}; width: 20px; height: 20px; border-radius: 50%;"></div>
+                        </td>
+                        <td class="action-buttons">
+                            <a href="{% url 'product_variant_update' variant.id %}" class="btn">Edit</a>
+                            <form action="{% url 'product_variant_delete' variant.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="back-link">
+            <a href="{% url 'product_list' %}">Back to Product List</a>
+        </div>
+    </div>
 </body>
 </html>
