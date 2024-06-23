@@ -1,20 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Product List</title>
+    <title>Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .product-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .product-item {
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        .product-item img {
+            max-width: 100px;
+            margin-right: 20px;
+            border-radius: 5px;
+        }
+        .product-details {
+            flex: 1;
+        }
+        .product-details h2 {
+            margin: 0;
+            color: #333;
+        }
+        .product-details p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .product-actions {
+            text-align: right;
+        }
+        .product-actions a {
+            margin-left: 10px;
+            color: #FF0000;
+        }
+        .discount {
+            color: #FF5733;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>Products</h1>
-    <a href="{% url 'product:product_create' %}">Create Product</a>
-    <ul>
+    <a href="{% url 'product_create' %}">Create New Product</a>
+    <ul class="product-list">
         {% for product in products %}
-        <li>
-            {{ product.product_name }}
-            <a href="{% url 'product:product_update' product.id %}">Edit</a>
-            <a href="{% url 'product:product_delete' product.id %}">Delete</a>
-            <a href="{% url 'product:product_variant_list' product.id %}">View Variants</a>
-        </li>
+            <li class="product-item">
+                <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }} thumbnail">
+                <div class="product-details">
+                    <h2>{{ product.product_name }}</h2>
+<!--                    <p>{{ product.product_description }}</p>-->
+                    <p>Category: {{ product.product_category.category_name }}</p>
+                    <p>Brand: {{ product.product_brand.name }}</p>
+                    <p>Price: ${{ product.price }}</p>
+                    {% if product.offer_price %}
+                        <p>Offer Price: ${{ product.offer_price }}</p>
+                        <p class="discount">Discount: {{ product.percentage_discount }}%</p>
+                    {% endif %}
+                </div>
+                <div class="product-actions">
+                    <a href="{% url 'product_update' product.pk %}">Edit</a>
+                    <a href="{% url 'product_delete' product.pk %}">Delete</a>
+                    <a href="{% url 'product_variant_create' product.pk %}">Add Variant</a>
+                    <a href="{% url 'product_image_create' product.pk %}">Add Image</a>
+                </div>
+            </li>
         {% endfor %}
     </ul>
 </body>
