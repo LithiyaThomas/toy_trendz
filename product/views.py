@@ -1,5 +1,5 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy,reverse
 from .models import Product, ProductVariant, ProductImage, Category, Brand
 from .forms import ProductForm, ProductVariantForm, ProductImageForm
 from django.shortcuts import get_object_or_404
@@ -11,14 +11,15 @@ class ProductListView(ListView):
     context_object_name = 'products'
 
     def get_queryset(self):
-        return Product.objects.select_related('product_category', 'product_brand').all()
-
+        return Product.objects.select_related('product_category', 'product_brand') \
+                              .prefetch_related('productvariant_set', 'productimage_set') \
+                              .all()
 # Product CreateView
 class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'product/product_form.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('product:product_list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -31,7 +32,7 @@ class ProductUpdateView(UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'product/product_form.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('product:product_list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,7 +47,7 @@ class ProductUpdateView(UpdateView):
 class ProductDeleteView(DeleteView):
     model = Product
     template_name = 'product/product_confirm_delete.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('product:product_list')
 
 # Product Variant CreateView
 class ProductVariantCreateView(CreateView):
@@ -74,9 +75,28 @@ class ProductVariantUpdateView(UpdateView):
 class ProductVariantDeleteView(DeleteView):
     model = ProductVariant
     template_name = 'product/product_variant_confirm_delete.html'
+    success_url = reverse_lazy('product_list')  # Adjust as per your application
 
-    def get_success_url(self):
-        return reverse_lazy('product_variants', kwargs={'product_id': self.object.product_id})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['variant'] = self.get_object()  # Ensure `get_object()` retrieves the correct variant
+        return context
+
+
+class ProductVariantListView(ListView):
+    model = ProductVariant
+    template_name = 'product/product_variant_list.html'
+    context_object_name = 'variants'
+
+    def get_queryset(self):
+        self.product = get_object_or_404(Product, pk=self.kwargs['product_id'])
+        return ProductVariant.objects.filter(product=self.product)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        return context
+
 
 # Product Image CreateView
 class ProductImageCreateView(CreateView):
@@ -89,17 +109,48 @@ class ProductImageCreateView(CreateView):
         form.instance.product_id = self.kwargs['product_id']
         return super().form_valid(form)
 
-class ProductVariantListView(ListView):
-    model = ProductVariant
-    template_name = 'product/product_variant_list.html'
-    context_object_name = 'product_variants'
+
+class ProductImageListView(ListView):
+    model = ProductImage
+    template_name = 'product/product_image_list.html'
+    context_object_name = 'product_images'
 
     def get_queryset(self):
         product_id = self.kwargs['product_id']
         self.product = get_object_or_404(Product, pk=product_id)
-        return ProductVariant.objects.filter(product=self.product)
+        return ProductImage.objects.filter(product=self.product)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['product'] = self.product
         return context
+
+# ProductImageUpdateView
+class ProductImageUpdateView(UpdateView):
+    model = ProductImage
+    form_class = ProductImageForm
+    template_name = 'product/product_image_form.html'
+
+    def get_success_url(self):
+        return reverse('product_images', kwargs={'product_id': self.object.product.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.object.product
+        return context
+
+# ProductImageDeleteView
+class ProductImageDeleteView(DeleteView):
+    model = ProductImage
+    template_name = 'product/product_image_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse('product_images', kwargs={'product_id': self.object.product.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.object.product
+        return context
+
+
+

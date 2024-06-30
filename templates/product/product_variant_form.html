@@ -2,115 +2,165 @@
 <html>
 <head>
     <title>Add Variant</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: flex-start; /* Align content to the start (left) */
+        align-items: center; /* Center aligns vertically */
+        min-height: 100vh;
+    }
 
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
-            width: 100%;
-        }
+    .sidebar {
+        width: 250px;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+        padding-top: 20px;
+        border-right: 1px solid #ddd;
+        position: fixed; /* Fixed position to keep sidebar in view */
+        left: 0; /* Positioning on the left edge */
+        top: 0; /* Start from the top */
+        z-index: 1000; /* Ensure sidebar is above other content */
+    }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+    .sidebar h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+    .sidebar a {
+        display: block;
+        padding: 15px;
+        text-decoration: none;
+        font-size: 18px;
+        color: #000;
+        transition: background-color 0.3s ease;
+    }
 
-        input[type="text"],
-        input[type="number"],
-        input[type="color"] {
-            width: calc(100% - 20px);
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-        }
+    .sidebar a:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
 
-        input[type="checkbox"] {
-            width: auto;
-            margin-right: 10px;
-        }
+    .sidebar a.active {
+        background-color: #e7e9fc;
+        color: #000;
+    }
 
-        .color-code-wrapper {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+    .container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 450px;
+        width: 100%;
+        margin: 0 auto; /* Center the container horizontally */
+    }
 
-        .input-with-color {
-            display: flex;
-            align-items: center;
-            width: calc(100% - 20px);
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-        }
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
 
-        .input-with-color input[type="text"] {
-            border: none;
-            flex-grow: 1;
-            padding: 12px;
-            background-color: transparent;
-        }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
 
-        .input-with-color .color-box {
-            width: 70px;
-            height: 70px;
-            margin-left: 10px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    input[type="text"],
+    input[type="number"],
+    input[type="color"] {
+        width: calc(100% - 20px);
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
 
-        .input-with-color input[type="color"] {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: transparent;
-            cursor: pointer;
-        }
+    input[type="checkbox"] {
+        width: auto;
+        margin-right: 10px;
+    }
 
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-        }
+    .color-code-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
 
-        button:hover {
-            background-color: #218838;
-        }
-    </style>
+    .input-with-color {
+        display: flex;
+        align-items: center;
+        width: calc(100% - 20px);
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
+
+    .input-with-color input[type="text"] {
+        border: none;
+        flex-grow: 1;
+        padding: 12px;
+        background-color: transparent;
+    }
+
+    .input-with-color .color-box {
+        width: 70px;
+        height: 70px;
+        margin-left: 10px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input-with-color input[type="color"] {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+    }
+
+    button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+    }
+
+    button:hover {
+        background-color: #218838;
+    }
+</style>
+
+
 </head>
 <body>
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="{% url 'user_data' %}">Users</a>
+        <a href="{% url 'category:category_list' %}">Categories</a>
+        <a href="{% url 'brand:brand_list' %}">Brands</a>
+        <a href="{% url 'product:product_list' %}">Products</a>
+        <a href="#">Cart</a>
+        <a href="#">Orders</a>
+        <a href="#">Sales Report</a>
+        <a href="#">Reviews</a>
+    </div>
     <div class="container">
         <h1>Add Variant for Product {{ product_id }}</h1>
         <form method="post">

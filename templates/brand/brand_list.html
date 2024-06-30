@@ -10,10 +10,39 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Changed from center to flex-start */
             height: 100vh;
-            padding-top: 50px; /* Added padding-top to adjust position */
+        }
+
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #f8f9fa;
+            height: 100vh;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #000;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .sidebar a.active {
+            background-color: #e7e9fc;
+            color: #000;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
         }
 
         .container {
@@ -21,7 +50,6 @@
             padding: 20px 40px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 600px;
         }
 
         h1 {
@@ -108,21 +136,38 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Brands</h1>
-        <a href="{% url 'brand:brand_create' %}" class="add-brand">Add Brand</a>
-        <ul>
-            {% for brand in brands %}
-                <li>
-                    <span class="brand-name">{{ brand.name }}</span>
-                    <div class="actions">
-                        <a href="{% url 'brand:brand_update' brand.id %}" class="edit">Edit</a>
-                        <a href="{% url 'brand:brand_delete' brand.id %}" class="delete">Delete</a>
-                        <a href="{% url 'brand:brand_restore' brand.id %}" class="restore">Restore</a>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+    <div class="sidebar">
+        <h2 class="text-center">Dashboard</h2>
+        <a href="{% url 'user_data' %}">Users</a>
+        <a href="{% url 'category:category_list' %}">Categories</a>
+        <a href="{% url 'brand:brand_list' %}">Brands</a>
+        <a href="{% url 'product:product_list' %}">Products</a>
+        <a href="#">Cart</a>
+        <a href="#">Orders</a>
+        <a href="#">Sales Report</a>
+        <a href="#">Reviews</a>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>Brands</h1>
+            <a href="{% url 'brand:brand_create' %}" class="add-brand">Add Brand</a>
+            <ul>
+                {% for brand in brands %}
+                    <li>
+                        <span class="brand-name">{{ brand.name }}</span>
+                        <div class="actions">
+                            <a href="{% url 'brand:brand_update' brand.id %}" class="edit">Edit</a>
+                            {% if brand.is_deleted %}
+                                <a href="{% url 'brand:brand_restore' brand.id %}" class="restore">Restore</a>
+                            {% else %}
+                                <a href="{% url 'brand:brand_delete' brand.id %}" class="delete">Delete</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </body>
 </html>

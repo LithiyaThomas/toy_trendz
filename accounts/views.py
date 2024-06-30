@@ -9,9 +9,11 @@ from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from dateutil.parser import parse
 
+
 # Generate a random OTP
 def generate_otp():
     return random.randint(100000, 999999)
+
 
 # User login view
 def user_login(request):
@@ -24,12 +26,12 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 return redirect('home')
-                # return redirect(settings.LOGIN_REDIRECT_URL) # Use the LOGIN_REDIRECT_URL from settings
             else:
                 form.add_error(None, 'Invalid email or password')
     else:
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
+
 
 # User registration view
 def user_register(request):
@@ -38,7 +40,7 @@ def user_register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False  # Deactivate account until it is confirmed
-            user.save()
+
             otp = generate_otp()
             send_mail(
                 "Your OTP Code",
@@ -46,11 +48,10 @@ def user_register(request):
                 settings.DEFAULT_FROM_EMAIL,
                 [user.email],
 
-
             )
             # Store the OTP in the session
             request.session['otp'] = str(otp)
-            request.session['user_id'] = user.id
+            request.session['user_data'] = form.cleaned_data
             request.session['otp_creation_time'] = timezone.now().isoformat()
             return redirect('verify_otp')  # Redirect to the OTP verification page
         else:
@@ -59,35 +60,33 @@ def user_register(request):
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
 
+
 # OTP verification view
 def verify_otp(request):
     if request.method == "POST":
         entered_otp = request.POST.get('entered_otp')
         otp = request.session.get('otp')
         otp_creation_time = request.session.get('otp_creation_time')
+        user_data = request.session.get('user_data')
 
         if not otp or not otp_creation_time:
             messages.error(request, 'OTP not found or expired. Please try registering again.')
             return redirect('user_register')
 
         otp_creation_time = parse(otp_creation_time)
-        if (timezone.now() - otp_creation_time).total_seconds() > 300:  # Example: 5 minutes
-            messages.error(request, 'OTP expired. Please try registering again.')
-            return redirect('user_register')
+        if (timezone.now() - otp_creation_time).total_seconds() > 120:
+            messages.error(request, 'OTP expired. Please resend OTP.')
+            return redirect('verify_otp')
 
         if entered_otp == otp:
-            user_id = request.session.get('user_id')
-            if not user_id:
-                messages.error(request, 'User ID not found in session. Please try registering again.')
-                return redirect('user_register')
-
-            try:
-                user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                messages.error(request, 'User not found. Please try registering again.')
-                return redirect('user_register')
-
-            # Activate the user and log them in
+            user = User.objects.create_user(
+                full_name=user_data['full_name'],
+                username=user_data['username'],
+                email=user_data['email'],
+                password=user_data['password'],
+                phone=user_data['phone'],
+                # Add other fields as necessary
+            )
             user.is_active = True
             user.save()
 
@@ -98,15 +97,37 @@ def verify_otp(request):
             # Clear session data
             request.session.pop('otp', None)
             request.session.pop('otp_creation_time', None)
-            request.session.pop('user_id', None)
-
+            request.session.pop('user_data', None)
             return redirect('home')
         else:
             messages.error(request, 'Invalid OTP')
 
-    return render(request, 'accounts/otp_verify.html')
+    otp_creation_time = request.session.get('otp_creation_time')
+    otp_expiration_time = parse(otp_creation_time) + timezone.timedelta(seconds=120)
+    return render(request, 'accounts/otp_verify.html', {'otp_expiration_time': otp_expiration_time.isoformat() })
 
-# Home view
+
+def resend_otp(request):
+    user_data = request.session.get('user_data')
+
+    if not user_data:
+        messages.error(request, 'User data not found. Please try registering again.')
+        return redirect('user_register')
+
+    otp = generate_otp()
+    send_mail(
+        "Your OTP Code",
+        f"Your new OTP code is {otp}",
+        settings.DEFAULT_FROM_EMAIL,
+        [user_data['email']],
+    )
+
+    request.session['otp'] = str(otp)
+    request.session['otp_creation_time'] = timezone.now().isoformat()
+
+    messages.success(request, 'A new OTP has been sent to your email.')
+    return redirect('verify_otp')
+
+
 def home(request):
-
     return render(request, 'accounts/home.html')

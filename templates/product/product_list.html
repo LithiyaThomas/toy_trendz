@@ -1,93 +1,159 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Products</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f8f8;
             margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #f8f9fa;
+            height: 100vh;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #000;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .sidebar a.active {
+            background-color: #e7e9fc;
+            color: #000;
+        }
+
+        .main-content {
+            flex-grow: 1;
             padding: 20px;
         }
+
         h1 {
             color: #333;
             text-align: center;
         }
+
         a {
             text-decoration: none;
             color: #007BFF;
         }
+
         a:hover {
             text-decoration: underline;
         }
-        .product-list {
-            list-style-type: none;
-            padding: 0;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        .product-item {
-            background-color: #fff;
-            margin-bottom: 20px;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
         }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
         .product-item img {
-            max-width: 100px;
-            margin-right: 20px;
+            max-width: 80px; /* Adjust thumbnail size as needed */
             border-radius: 5px;
         }
-        .product-details {
-            flex: 1;
-        }
-        .product-details h2 {
-            margin: 0;
-            color: #333;
-        }
-        .product-details p {
-            margin: 5px 0;
-            color: #666;
-        }
-        .product-actions {
-            text-align: right;
-        }
-        .product-actions a {
-            margin-left: 10px;
-            color: #FF0000;
-        }
+
         .discount {
             color: #FF5733;
             font-weight: bold;
         }
+
+        .product-actions a {
+            margin-right: 10px;
+            color: #FF0000;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none; /* Hide sidebar on smaller screens */
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Products</h1>
-    <a href="{% url 'product_create' %}">Create New Product</a>
-    <ul class="product-list">
-        {% for product in products %}
-            <li class="product-item">
-                <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }} thumbnail">
-                <div class="product-details">
-                    <h2>{{ product.product_name }}</h2>
-<!--                    <p>{{ product.product_description }}</p>-->
-                    <p>Category: {{ product.product_category.category_name }}</p>
-                    <p>Brand: {{ product.product_brand.name }}</p>
-                    <p>Price: ${{ product.price }}</p>
-                    {% if product.offer_price %}
-                        <p>Offer Price: ${{ product.offer_price }}</p>
-                        <p class="discount">Discount: {{ product.percentage_discount }}%</p>
-                    {% endif %}
-                </div>
-                <div class="product-actions">
-                    <a href="{% url 'product_update' product.pk %}">Edit</a>
-                    <a href="{% url 'product_delete' product.pk %}">Delete</a>
-                    <a href="{% url 'product_variant_create' product.pk %}">Add Variant</a>
-                    <a href="{% url 'product_image_create' product.pk %}">Add Image</a>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="sidebar">
+        <h2 class="text-center">Dashboard</h2>
+        <a href="{% url 'user_data' %}">Users</a>
+        <a href="{% url 'category:category_list' %}">Categories</a>
+        <a href="{% url 'brand:brand_list' %}">Brands</a>
+        <a href="{% url 'product:product_list' %}" class="active">Products</a>
+        <a href="#">Cart</a>
+        <a href="#">Orders</a>
+        <a href="#">Sales Report</a>
+        <a href="#">Reviews</a>
+    </div>
+
+    <div class="main-content">
+        <h1>Products</h1>
+        <a href="{% url 'product:product_create' %}">Create New Product</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Thumbnail</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Brand</th>
+                    <th>Price</th>
+                    <th>Offer Price</th>
+                    <th>Discount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.thumbnail %}
+                                <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }} thumbnail">
+                            {% else %}
+                                <img src="{% static 'accounts/images/default.jpg' %}" alt="Default thumbnail">
+                            {% endif %}
+
+                        </td>
+                        <td>{{ product.product_name }}</td>
+                        <td>{{ product.product_category.category_name }}</td>
+                        <td>{{ product.product_brand.name }}</td>
+                        <td>${{ product.price }}</td>
+                        <td>{% if product.offer_price %}${{ product.offer_price }}{% endif %}</td>
+                        <td>{% if product.offer_price %}{{ product.percentage_discount }}%{% endif %}</td>
+                        <td>
+                            <a href="{% url 'product:product_update' product.pk %}">Edit</a>
+                            <a href="{% url 'product:product_delete' product.pk %}">Delete</a>
+                            <a href="{% url 'product:product_variants' product.pk %}">Variants</a>
+                            <a href="{% url 'product:product_images' product.pk %}">Images</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

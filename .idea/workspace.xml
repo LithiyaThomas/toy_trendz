@@ -21,20 +21,28 @@
   <component name="ChangeListManager">
     <list default="true" id="1bd12e59-14b0-4c90-96db-f9391668bcc7" name="Default Changelist" comment="added product">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToyTrendz/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ToyTrendz/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ToyTrendz/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ToyTrendz/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accounts/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin_panel/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin_panel/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin_panel/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin_panel/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug.log" beforeDir="false" afterPath="$PROJECT_DIR$/debug.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/brand/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/brand/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/category/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/category/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/product/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/product/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/product/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/adminside/admin_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminside/admin_login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/otp_verify.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/otp_verify.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminside/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminside/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/adminside/user_data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/adminside/user_data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/brand/brand_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/brand/brand_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/brand/brand_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/brand/brand_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/category/category_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/category/category_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/category/category_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/category/category_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/product/product_confirm_delete.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/product/product_confirm_delete.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/product/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/product/product_detail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/product/product_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/product/product_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/product/product_image_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/product/product_image_form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/product/product_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/product/product_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/product/product_variant_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/product/product_variant_form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/product/product_variant_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/product/product_variant_list.html" afterDir="false" />
@@ -61,6 +69,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -94,10 +103,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="added product" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="416" y="163" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1718687546551">
+    <state x="416" y="163" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1719487966220">
       <screen x="0" y="0" width="1280" height="720" />
     </state>
-    <state x="416" y="163" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1280.720@0.0.1280.720" timestamp="1718687546551" />
+    <state x="416" y="163" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1280.720@0.0.1280.720" timestamp="1719487966220" />
     <state x="421" y="116" key="FileChooserDialogImpl" timestamp="1718446956626">
       <screen x="0" y="0" width="1280" height="720" />
     </state>
@@ -106,6 +115,10 @@
       <screen x="0" y="40" width="1280" height="680" />
     </state>
     <state x="233" y="114" key="Vcs.Push.Dialog.v2/0.40.1280.680@0.40.1280.680" timestamp="1718855787912" />
+    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup" timestamp="1719383461295">
+      <screen x="0" y="0" width="1280" height="720" />
+    </state>
+    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup/0.0.1280.720@0.0.1280.720" timestamp="1719383461295" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -117,7 +130,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/accounts/views.py</url>
-          <line>41</line>
+          <line>43</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

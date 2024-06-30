@@ -10,6 +10,11 @@
 <body>
     <div class="modal">
         <div class="modal-content">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-warning">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
             <form id="join_form" method="POST" action="{% url 'user_register' %}">
                 {% csrf_token %}
                 {{ form.full_name }}
