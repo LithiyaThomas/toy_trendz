@@ -7,6 +7,7 @@ from category.models import Category
 # Product Model
 
 
+
 class Product(models.Model):
     product_name = models.CharField(max_length=100, null=False)
     product_description = models.TextField(max_length=5000, null=False)

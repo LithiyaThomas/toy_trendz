@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Product Variant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+        form {
+            margin-top: 20px;
+        }
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #c82333;
+        }
+        a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: #007BFF;
+            cursor: pointer;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+  .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #f8f9fa;
+            height: 100vh;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #000;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .sidebar a.active {
+            background-color: #e7e9fc;
+            color: #000;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 class="text-center">Dashboard</h2>
+        <a href="{% url 'user_data' %}">Users</a>
+        <a href="{% url 'category:category_list' %}">Categories</a>
+        <a href="{% url 'brand:brand_list' %}">Brands</a>
+        <a href="{% url 'product:product_list' %}">Products</a>
+        <a href="#">Cart</a>
+        <a href="#">Orders</a>
+        <a href="#">Sales Report</a>
+        <a href="#">Reviews</a>
+    </div>
+    <h1>Delete Product Variant</h1>
+    <p>Are you sure you want to delete the product variant "{{ variant.product }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirm Delete</button>
+        <a href="{% url 'product:product_variants' product_id=variant.product_id %}">Cancel</a>
+    </form>
+</body>
+</html>

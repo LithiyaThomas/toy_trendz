@@ -1,24 +1,20 @@
 from django.urls import path
-from .views import (
-    ProductListView,
-    ProductCreateView,
-    ProductUpdateView,
-    ProductDeleteView,
-    ProductVariantCreateView,
-    ProductImageCreateView,
-    ProductVariantListView,
-    ProductVariantUpdateView,
-    ProductVariantDeleteView,
-)
+from .views import *
+
+app_name = 'product'
 
 urlpatterns = [
-    path('product_list/', ProductListView.as_view(), name='product_list'),
-    path('product/<int:product_id>/variants/', ProductVariantListView.as_view(), name='product_variants'),
-    path('product/new/', ProductCreateView.as_view(), name='product_create'),
-    path('product/<int:pk>/edit/', ProductUpdateView.as_view(), name='product_update'),
-    path('product/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
-    path('product/<int:product_id>/variant/new/', ProductVariantCreateView.as_view(), name='product_variant_create'),
-    path('product/<int:product_id>/image/new/', ProductImageCreateView.as_view(), name='product_image_create'),
-    path('product/variant/<int:pk>/edit/', ProductVariantUpdateView.as_view(), name='product_variant_update'),
-    path('product/variant/<int:pk>/delete/', ProductVariantDeleteView.as_view(), name='product_variant_delete'),
+    path('', ProductListView.as_view(), name='product_list'),
+    path('create/', ProductCreateView.as_view(), name='product_create'),
+    path('update/<int:pk>/', ProductUpdateView.as_view(), name='product_update'),
+    path('delete/<int:pk>/', ProductDeleteView.as_view(), name='product_delete'),
+    path('<int:product_id>/variants/', ProductVariantListView.as_view(), name='product_variants'),
+    path('<int:product_id>/variants/create/', ProductVariantCreateView.as_view(), name='product_variant_create'),
+    path('<int:product_id>/variants/<int:pk>/edit/', ProductVariantUpdateView.as_view(), name='edit_variant'),  # Define edit_variant URL here
+    path('<int:product_id>/variants/<int:pk>/delete/', ProductVariantDeleteView.as_view(), name='delete_variant'),
+    path('<int:product_id>/images/', ProductImageListView.as_view(), name='product_images'),
+    path('<int:product_id>/images/create/', ProductImageCreateView.as_view(), name='product_image_create'),
+    path('product/<int:product_id>/images/<int:pk>/edit/', ProductImageUpdateView.as_view(), name='edit_image'),
+    path('product/<int:product_id>/images/<int:pk>/delete/', ProductImageDeleteView.as_view(), name='delete_image'),
+
 ]

@@ -6,7 +6,7 @@ from .models import Brand
 
 # List Brands
 def brand_list(request):
-    brands = Brand.objects.filter(is_deleted=False)
+    brands = Brand.objects.all()
     return render(request, 'brand/brand_list.html', {'brands': brands})
 
 # Create Brand
