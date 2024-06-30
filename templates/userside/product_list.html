@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product List</title>
+</head>
+<body>
+    <h1>Products</h1>
+    <ul>
+
+         {% for product in products %}
+    <li>
+        <h3>{{ product.product_name }}</h3>
+        <p>{{ product.product_description }}</p><p>Category: {{ product.product_category.category_name }}</p>
+        <p>Brand: {{ product.product_brand.name }}</p>
+        <p>Price: {{ product.price }}</p>
+        <p>Offer Price: {{ product.offer_price }}</p>
+        <p>Discount: {{ product.percentage_discount }}%</p>
+        {% if product.thumbnail %}
+            <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }}">
+        {% endif %}
+    </li>
+    {% empty %}
+    <li>No products found.</li>
+    {% endfor %}
+
+    </ul>
+</body>
+</html>
