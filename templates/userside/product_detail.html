@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Detail: {{ object.product_name }}</title>
+    <style>
+        /* Optional: Add any custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .product-details {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .product-details img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            display: block;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .product-details h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .product-details p {
+            margin-bottom: 10px;
+        }
+        .product-details .price {
+            font-weight: bold;
+            color: #009688; /* Teal color, adjust as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="product-details">
+        <h1>{{ object.product_name }}</h1>
+        <img src="{{ object.thumbnail.url }}" alt="{{ object.product_name }}">
+        <p>{{ object.product_description }}</p>
+        <p><strong>Category:</strong> {{ object.product_category.category_name }}</p>
+        <p><strong>Brand:</strong> {{ object.product_brand.name }}</p>
+        <p><strong>Price:</strong> <span class="price">${{ object.price }}</span></p>
+        <p><strong>Offer Price:</strong> <span class="price">${{ object.offer_price }}</span></p>
+
+    </div>
+</body>
+</html>
