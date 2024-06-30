@@ -3,16 +3,64 @@
 <head>
     <title>Product Detail: {{ object.product_name }}</title>
     <style>
-        /* Optional: Add any custom styles here */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            padding: 20px;
+        /* Navbar styles */
+        .navbar {
+            background-color: #ed54a4;
+            padding: 10px 20px;
+            height: 70px; /* Adjust height as needed */
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+        .navbar a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Breadcrumbs styles */
+        .breadcrumbs {
+            margin: 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumbs a {
+            color: #ed54a4;
+            text-decoration: none;
+        }
+
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumbs span {
+            margin: 0 5px;
+        }
+
+        /* Product details container */
+        .product-container {
+            max-width: 900px;
+            margin: 20px auto; /* Center the container */
+            display: flex;
+            gap: 20px;
+        }
+
         .product-details {
-            max-width: 600px;
-            margin: 0 auto;
+            flex: 2;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
         }
+
         .product-details img {
             max-width: 100%;
             height: auto;
@@ -20,30 +68,146 @@
             display: block;
             border: 1px solid #ccc;
             border-radius: 5px;
+            cursor: zoom-in;
         }
+
         .product-details h1 {
             font-size: 24px;
             margin-bottom: 10px;
         }
+
         .product-details p {
             margin-bottom: 10px;
         }
+
         .product-details .price {
             font-weight: bold;
             color: #009688; /* Teal color, adjust as needed */
         }
+
+        .product-details .discount {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Add to cart button */
+        .add-to-cart-btn {
+            background-color: #ed54a4;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 18px;
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .delivery-info {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        .delivery-info h2 {
+            font-size: 16px;
+            color: #ed54a4;
+            margin-bottom: 10px;
+        }
+
+        .delivery-info p {
+            margin: 5px 0;
+        }
+
+        /* Ratings */
+        .ratings {
+            margin-top: 20px;
+        }
+
+        .stars {
+            color: #ffcc00; /* Star color */
+            font-size: 24px;
+        }
+
+        .fa.fa-star {
+            margin-right: 5px;
+        }
+
+        .fa.fa-star.checked {
+            color: #ffcc00; /* Color for checked stars */
+        }
     </style>
+    <!-- Include zoom.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/zoom.js@0.3.0/dist/zoom.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/zoom.js@0.3.0/dist/zoom.css">
 </head>
 <body>
-    <div class="product-details">
-        <h1>{{ object.product_name }}</h1>
-        <img src="{{ object.thumbnail.url }}" alt="{{ object.product_name }}">
-        <p>{{ object.product_description }}</p>
-        <p><strong>Category:</strong> {{ object.product_category.category_name }}</p>
-        <p><strong>Brand:</strong> {{ object.product_brand.name }}</p>
-        <p><strong>Price:</strong> <span class="price">${{ object.price }}</span></p>
-        <p><strong>Offer Price:</strong> <span class="price">${{ object.offer_price }}</span></p>
-
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="{% url 'user_panel:user_products' %}">Home</a>
+        <a href="{% url 'user_panel:user_products' %}">Products</a>
     </div>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{% url 'user_panel:user_products' %}">Home</a>
+        <span>&gt;</span>
+        <a href="{% url 'user_panel:user_products' %}">Products</a>
+        <span>&gt;</span>
+        <span>{{ object.product_name }}</span>
+    </div>
+
+    <!-- Product container -->
+    <div class="product-container">
+        <!-- Product details -->
+        <div class="product-details">
+            <h1>{{ object.product_name }}</h1>
+            {% if object.thumbnail %}
+                <img src="{{ object.thumbnail.url }}" alt="{{ object.product_name }}" data-action="zoom">
+            {% endif %}
+            <p>{{ object.product_description }}</p>
+            <p><strong>Category:</strong> {{ object.product_category.category_name }}</p>
+            <p><strong>Brand:</strong> {{ object.product_brand.name }}</p>
+            <p><strong>Price:</strong> <span class="price">${{ object.price }}</span></p>
+            <p><strong>Offer Price:</strong> <span class="price">${{ object.offer_price }}</span></p>
+            <p class="discount">Discount: {{ object.percentage_discount }}%</p>
+
+            <!-- Ratings -->
+            <div class="ratings">
+                <h3>Ratings:</h3>
+                <div class="stars">
+                    <!-- Insert dynamic stars based on rating value -->
+                    {% for star in object.average_rating_range %}
+                        <span class="fa fa-star {% if star <= object.average_rating %}checked{% endif %}"></span>
+                    {% endfor %}
+                    <span>({{ object.average_rating }})</span>
+                </div>
+                <p>Total Reviews: {{ object.total_reviews }}</p>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+
+        <!-- Delivery Info -->
+        <div class="delivery-info">
+            <h2>Delivery</h2>
+            <p>Get it in <span style="color: green;">2-3 days</span>. Usually ships within a day.</p>
+            <p>Cash on delivery available.</p>
+            <p>15 days return.</p>
+            <p>15 days exchange.</p>
+        </div>
+    </div>
+
+    <!-- Initialize zoom.js -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            zoom.setup();
+        });
+    </script>
 </body>
 </html>
