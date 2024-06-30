@@ -2,27 +2,86 @@
 <html>
 <head>
     <title>Product List</title>
+    <style>
+        /* Navbar styles */
+        .navbar {
+            background-color: #ed54a4;
+            padding: 10px 20px;
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* Product card styles */
+        .product-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px;
+            width: 300px;
+            display: inline-block;
+            vertical-align: top;
+            background-color: #fff;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .product-card h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .product-card p {
+            margin-bottom: 8px;
+        }
+        .product-card .price {
+            font-weight: bold;
+            color: #009688; /* teal color, adjust as needed */
+        }
+        .product-card .add-to-cart-btn {
+            background-color: #009688; /* teal color, adjust as needed */
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .product-card .product-description {
+            font-size: 12px;
+            line-height: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1; /* Number of lines to show */
+            -webkit-box-orient: vertical;
+        }
+    </style>
 </head>
 <body>
-    <h1>Products</h1>
-    <ul>
+    <div class="navbar">
+        <h1>Products</h1>
+    </div>
 
-         {% for product in products %}
-    <li>
-        <h3>{{ product.product_name }}</h3>
-        <p>{{ product.product_description }}</p><p>Category: {{ product.product_category.category_name }}</p>
-        <p>Brand: {{ product.product_brand.name }}</p>
-        <p>Price: {{ product.price }}</p>
-        <p>Offer Price: {{ product.offer_price }}</p>
-        <p>Discount: {{ product.percentage_discount }}%</p>
-        {% if product.thumbnail %}
-            <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }}">
-        {% endif %}
-    </li>
-    {% empty %}
-    <li>No products found.</li>
+     {% for product in products %}
+    <a href="{% url 'user_panel:product_detail' pk=product.id %}">
+        <div class="product-card">
+            {% if product.thumbnail %}
+                <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }}">
+            {% endif %}
+            <h2>{{ product.product_name }}</h2>
+            <p class="product-description">{{ product.product_description }}</p>
+            <p>Category: {{ product.product_category.category_name }}</p>
+            <p>Brand: {{ product.product_brand.name }}</p>
+            <p>Price: <span class="price">${{ product.price }}</span></p>
+            <p>Offer Price: <span class="price">${{ product.offer_price }}</span></p>
+            <button class="add-to-cart-btn">Add to Cart</button>
+        </div>
+    </a>
     {% endfor %}
-
-    </ul>
 </body>
 </html>
