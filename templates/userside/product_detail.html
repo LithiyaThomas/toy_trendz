@@ -29,19 +29,35 @@
             margin-top: 10px;
             justify-content: center;
         }
-        .side-image {
-            cursor: pointer;
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
+        .side-image, .main-product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        .main-product-image {
-            max-width: 100%;
-            height: auto;
+        .main-image-container {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            margin: 0 auto;
             border: 1px solid #ccc;
             border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .side-image-container {
+            width: 80px;
+            height: 80px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .product-details {
             background-color: #f9f9f9;
@@ -62,10 +78,18 @@
             background-color: #ed54a4;
             color: #fff;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 80px;  /* Reduced padding */
             cursor: pointer;
             border-radius: 5px;
-            font-size: 18px;
+            font-size: 16px;  /* Reduced font size */
+        }
+        .custom-submit-btn {
+            background-color: #ed54a4;
+            color: #fff;
+            border: none;
+            padding: 12px 40px;  /* Increased padding */
+            font-size: 18px;  /* Increased font size */
+            border-radius: 5px;
         }
         .ratings .fa-star {
             color: #ffcc00;
@@ -74,6 +98,29 @@
             border-top: 1px solid #ccc;
             padding-top: 20px;
             margin-top: 20px;
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 24px;
+            color: #ddd;
+            cursor: pointer;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffcc00;
+        }
+        .rating-display {
+            display: flex;
+            gap: 5px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -99,17 +146,21 @@
 
         <div class="row product-container">
             <div class="col-md-6">
-                <div class="text-center">
+                <div class="main-image-container text-center">
                     <img id="main-product-image" src="{% if thumbnail_image %}{{ thumbnail_image }}{% endif %}" alt="{{ object.product_name }}" class="main-product-image">
                 </div>
                 <div class="side-images">
                     {% if thumbnail_image %}
-                        <img src="{{ thumbnail_image }}" alt="{{ object.product_name }}" class="side-image" onclick="updateMainImage('{{ thumbnail_image }}')">
+                        <div class="side-image-container">
+                            <img src="{{ thumbnail_image }}" alt="{{ object.product_name }}" class="side-image" onclick="updateMainImage('{{ thumbnail_image }}')">
+                        </div>
                     {% endif %}
                     {% if variant_images %}
                         {% for variant_image in variant_images %}
                             {% if variant_image.image.url != thumbnail_image %}
-                                <img src="{{ variant_image.image.url }}" alt="Variant Image" class="side-image" onclick="updateMainImage('{{ variant_image.image.url }}')">
+                                <div class="side-image-container">
+                                    <img src="{{ variant_image.image.url }}" alt="Variant Image" class="side-image" onclick="updateMainImage('{{ variant_image.image.url }}')">
+                                </div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -125,7 +176,7 @@
                     <p><strong>Price:</strong> <span class="price">${{ object.price }}</span></p>
                     <p><strong>Offer Price:</strong> <span class="price">${{ object.offer_price }}</span></p>
                     <p class="discount">Discount: {{ object.percentage_discount }}%</p>
-                    <button class="add-to-cart-btn btn btn-block">Add to Cart</button>
+                    <button class="add-to-cart-btn ">Add to Cart</button>
                 </div>
                 <div class="delivery-info mt-4">
                     <h2>Delivery</h2>
@@ -141,26 +192,30 @@
             <h2>Ratings</h2>
             {% if ratings %}
                 <p>Average Rating:
-                    {% for i in rating_range %}
-                        {% if i <= product.average_rating %}
-                            <span class="fa fa-star"></span>
-                        {% else %}
-                            <span class="fa fa-star-o"></span>
-                        {% endif %}
-                    {% endfor %}
+                    <div class="rating-display">
+                        {% for i in rating_range %}
+                            {% if i <= product.average_rating %}
+                                <span class="fa fa-star"></span>
+                            {% else %}
+                                <span class="fa fa-star-o"></span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                     ({{ product.total_reviews }} reviews)
                 </p>
                 <ul class="list-unstyled">
                     {% for rating in ratings %}
                         <li class="media mb-2">
                             <div class="media-body">
-                                {% for i in rating_range %}
-                                    {% if i <= rating.rating %}
-                                        <span class="fa fa-star"></span>
-                                    {% else %}
-                                        <span class="fa fa-star-o"></span>
-                                    {% endif %}
-                                {% endfor %}
+                                <div class="rating-display">
+                                    {% for i in rating_range %}
+                                        {% if i <= rating.rating %}
+                                            <span class="fa fa-star"></span>
+                                        {% else %}
+                                            <span class="fa fa-star-o"></span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
                                 <span>{{ rating.review }}</span>
                             </div>
                         </li>
@@ -172,36 +227,50 @@
         </div>
 
         <div class="rating-form mt-4">
-            {% if user_rating %}
-                <h2>Your Rating</h2>
-                <p>
-                    {% for i in rating_range %}
-                        {% if i <= user_rating.rating %}
-                            <span class="fa fa-star"></span>
-                        {% else %}
-                            <span class="fa fa-star-o"></span>
-                        {% endif %}
-                    {% endfor %}
-                    <span>{{ user_rating.review }}</span>
-                </p>
-            {% elif user.is_authenticated %}
-                <h2>Leave a Rating</h2>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="rating">Rating</label>
-                        <input type="number" name="rating" id="rating" min="1" max="5" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="review">Review</label>
-                        <textarea name="review" id="review" rows="4" class="form-control" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            {% else %}
-                <p>Please <a href="{% url 'login' %}">log in</a> to leave a rating.</p>
-            {% endif %}
-        </div>
+    {% if user_rating %}
+        <h2>Your Rating</h2>
+        <p>
+            <div class="rating-display">
+                {% for i in rating_range %}
+                    {% if i <= user_rating.rating %}
+                        <span class="fa fa-star"></span>
+                    {% else %}
+                        <span class="fa fa-star-o"></span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <span>{{ user_rating.review }}</span>
+        </p>
+    {% elif user.is_authenticated %}
+        <h2>Leave a Rating</h2>
+        <form method="POST" action="{% url 'user_panel:add_rating' object.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="rating">Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="5-stars" name="rating" value="5" required />
+                    <label for="5-stars" class="fa fa-star"></label>
+                    <input type="radio" id="4-stars" name="rating" value="4" />
+                    <label for="4-stars" class="fa fa-star"></label>
+                    <input type="radio" id="3-stars" name="rating" value="3" />
+                    <label for="3-stars" class="fa fa-star"></label>
+                    <input type="radio" id="2-stars" name="rating" value="2" />
+                    <label for="2-stars" class="fa fa-star"></label>
+                    <input type="radio" id="1-star" name="rating" value="1" />
+                    <label for="1-star" class="fa fa-star"></label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="review">Review</label>
+                <textarea name="review" id="review" rows="4" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn custom-submit-btn">Submit</button>
+        </form>
+    {% else %}
+        <p>Please <a href="{% url 'login' %}">log in</a> to leave a rating.</p>
+    {% endif %}
+</div>
+
     </div>
 
     <script>
