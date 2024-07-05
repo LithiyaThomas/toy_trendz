@@ -1,6 +1,6 @@
 # user_panel/views.py
 from django.views.generic import ListView
-from product.models import Product, Rating,ProductVariantImage
+from product.models import Category, Rating,ProductVariantImage
 from django.views.generic import DetailView
 from django.shortcuts import redirect, get_object_or_404
 from .forms import RatingForm
@@ -8,7 +8,7 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
 from product.models import Product, ProductVariant
-
+from django.db.models import Q
 
 class UserPanelProductListView(ListView):
     model = Product
@@ -16,8 +16,25 @@ class UserPanelProductListView(ListView):
     context_object_name = 'products'
 
     def get_queryset(self):
-        return Product.objects.all().select_related('product_category', 'product_brand') \
-                             .prefetch_related(Prefetch('productvariant_set', queryset=ProductVariant.objects.prefetch_related('productvariantimage_set')))
+        queryset = Product.objects.all().select_related('product_category', 'product_brand') \
+            .prefetch_related(
+            Prefetch('productvariant_set', queryset=ProductVariant.objects.prefetch_related('productvariantimage_set')))
+
+        query = self.request.GET.get('q')
+        category_id = self.request.GET.get('category')
+
+        if query:
+            queryset = queryset.filter(Q(product_name__icontains=query) | Q(product_description__icontains=query))
+
+        if category_id:
+            queryset = queryset.filter(product_category_id=category_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        return context
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'userside/product_detail.html'

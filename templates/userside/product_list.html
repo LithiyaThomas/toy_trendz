@@ -12,7 +12,61 @@
             text-align: center;
         }
 
-        /* Product card styles */
+        /* Layout styles */
+      .container {
+    display: flex;
+    max-width: 1200px; /* Keep the maximum width as is, unless you want to adjust it */
+    margin: 20px auto; /* Center the container */
+    padding: 0 20px; /* Horizontal padding inside the container */
+}
+
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 25%;
+            padding: 20px;
+            border-right: 1px solid #ccc;
+        }
+
+        .sidebar .form-group {
+            margin-bottom: 20px;
+        }
+
+        .sidebar .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-control, .btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #00bcd4; /* Changed to teal color */
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background-color: #00796b; /* Darker teal color on hover */
+        }
+
+        /* Product list styles */
+        .product-list {
+            width: 75%; /* Adjusted width to accommodate sidebar */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
         .product-card {
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -22,25 +76,31 @@
             display: inline-block;
             vertical-align: top;
             background-color: #fff;
+            text-align: center;
         }
+
         .product-card img {
             max-width: 100%;
             height: auto;
             margin-bottom: 10px;
         }
+
         .product-card h2 {
             font-size: 18px;
             margin-bottom: 10px;
         }
+
         .product-card p {
             margin-bottom: 8px;
         }
+
         .product-card .price {
             font-weight: bold;
             color: #009688; /* teal color, adjust as needed */
         }
+
         .product-card .add-to-cart-btn {
-            background-color: #009688; /* teal color, adjust as needed */
+            background-color: #00bcd4; /* Changed to teal color */
             color: #fff;
             border: none;
             padding: 8px 16px;
@@ -51,6 +111,11 @@
             display: inline-block;
             font-size: 14px;
         }
+
+        .product-card .add-to-cart-btn:hover {
+            background-color: #00796b; /* Darker teal color on hover */
+        }
+
         .product-card .product-description {
             font-size: 12px;
             line-height: 16px;
@@ -67,21 +132,44 @@
         <h1>Products</h1>
     </div>
 
-     {% for product in products %}
-    <a href="{% url 'user_panel:product_detail' pk=product.id %}">
-        <div class="product-card">
-            {% if product.thumbnail %}
-                <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }}">
-            {% endif %}
-            <h2>{{ product.product_name }}</h2>
-            <p class="product-description">{{ product.product_description }}</p>
-            <p>Category: {{ product.product_category.category_name }}</p>
-            <p>Brand: {{ product.product_brand.name }}</p>
-            <p>Price: <span class="price">${{ product.price }}</span></p>
-            <p>Offer Price: <span class="price">${{ product.offer_price }}</span></p>
-            <button class="add-to-cart-btn">Add to Cart</button>
+    <div class="container">
+        <div class="sidebar">
+            <form method="GET" action="{% url 'user_panel:user_products' %}">
+                <div class="form-group">
+                    <label for="search">Search Products</label>
+                    <input type="text" name="q" id="search" class="form-control" placeholder="Search products" value="{{ request.GET.q }}">
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select name="category" id="category" class="form-control">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
         </div>
-    </a>
-    {% endfor %}
+
+        <div class="product-list">
+            {% for product in products %}
+            <a href="{% url 'user_panel:product_detail' pk=product.id %}">
+                <div class="product-card">
+                    {% if product.thumbnail %}
+                        <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }}">
+                    {% endif %}
+                    <h2>{{ product.product_name }}</h2>
+                    <p class="product-description">{{ product.product_description }}</p>
+                    <p>Category: {{ product.product_category.category_name }}</p>
+                    <p>Brand: {{ product.product_brand.name }}</p>
+                    <p>Price: <span class="price">${{ product.price }}</span></p>
+                    <p>Offer Price: <span class="price">${{ product.offer_price }}</span></p>
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
 </body>
 </html>
