@@ -24,8 +24,8 @@ class Brand(models.Model):
     def permanent_delete(self):
         super(Brand, self).delete()
 
-    objects = models.Manager()  # Default manager
-    available_objects = BrandManager()  # Custom manager for non-deleted items
+    objects = models.Manager()
+    available_objects = BrandManager()
 
     def __str__(self):
         return self.name

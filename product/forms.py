@@ -1,5 +1,6 @@
+
 from django import forms
-from .models import Product, ProductVariant, ProductImage
+from .models import Product, ProductVariant, ProductVariantImage
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -11,7 +12,8 @@ class ProductVariantForm(forms.ModelForm):
         model = ProductVariant
         fields = ['colour_name', 'variant_stock', 'variant_status', 'colour_code']
 
-class ProductImageForm(forms.ModelForm):
+
+class ProductVariantImageForm(forms.ModelForm):
     class Meta:
-        model = ProductImage
+        model = ProductVariantImage
         fields = ['image']

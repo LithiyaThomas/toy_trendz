@@ -33,8 +33,8 @@ class Category(models.Model):
     def permanent_delete(self):
         super(Category, self).delete()
 
-    objects = models.Manager()  # Default manager
-    available_objects = CategoryManager()  # Custom manager for non-deleted items
+    objects = models.Manager()
+    available_objects = CategoryManager()
 
     def save(self, *args, **kwargs):
         if not self.slug:

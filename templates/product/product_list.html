@@ -91,6 +91,10 @@
             color: #FF0000;
         }
 
+        .restore {
+            color: #28a745; /* Green color for restore button */
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 display: none; /* Hide sidebar on smaller screens */
@@ -124,6 +128,7 @@
                     <th>Price</th>
                     <th>Offer Price</th>
                     <th>Discount</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -132,11 +137,10 @@
                     <tr>
                         <td>
                             {% if product.thumbnail %}
-                                <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }} thumbnail">
+                                <img src="{{ product.thumbnail.url }}" alt="{{ product.product_name }} thumbnail" class="product-item">
                             {% else %}
-                                <img src="{% static 'accounts/images/default.jpg' %}" alt="Default thumbnail">
+                                <img src="{% static 'accounts/images/default.jpg' %}" alt="Default thumbnail" class="product-item">
                             {% endif %}
-
                         </td>
                         <td>{{ product.product_name }}</td>
                         <td>{{ product.product_category.category_name }}</td>
@@ -144,16 +148,38 @@
                         <td>${{ product.price }}</td>
                         <td>{% if product.offer_price %}${{ product.offer_price }}{% endif %}</td>
                         <td>{% if product.offer_price %}{{ product.percentage_discount }}%{% endif %}</td>
+                        <td>{{ product.is_active|yesno:"Active,Inactive" }}</td>
                         <td>
                             <a href="{% url 'product:product_update' product.pk %}">Edit</a>
-                            <a href="{% url 'product:product_delete' product.pk %}">Delete</a>
+                            <a href="{% url 'product:product_toggle_active' product.pk %}">
+                                {% if product.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </a>
                             <a href="{% url 'product:product_variants' product.pk %}">Variants</a>
-                            <a href="{% url 'product:product_images' product.pk %}">Images</a>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const restoreButtons = document.querySelectorAll('.product-actions a');
+            restoreButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const text = this.innerText.trim();
+                    if (text === 'Delete') {
+                        this.innerText = 'Restore';
+                        this.classList.add('restore');
+                    } else if (text === 'Restore') {
+                        this.innerText = 'Delete';
+                        this.classList.remove('restore');
+                    }
+                    // Perform additional actions if needed
+                });
+            });
+        });
+    </script>
 </body>
 </html>

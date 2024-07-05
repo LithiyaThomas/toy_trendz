@@ -114,6 +114,13 @@
             text-align: center;
             margin-top: 20px;
         }
+        .images img {
+            width: 50px;
+            height: 50px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -128,7 +135,7 @@
         <a href="#">Sales Report</a>
         <a href="#">Reviews</a>
     </div>
-    <div class="main-content">
+     <div class="main-content">
         <div class="variant">
             <h1>Variants for {{ product.product_name }}</h1>
             <a href="{% url 'product:product_variant_create' product.pk %}" class="add-variant">Add Variant</a>
@@ -142,6 +149,7 @@
                     <th>Variant Stock</th>
                     <th>Variant Status</th>
                     <th>Colour</th>
+                    <th>Images</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -153,9 +161,25 @@
                         <td>{{ variant.variant_stock }}</td>
                         <td>{{ variant.variant_status }}</td>
                         <td><div class="box" style="background-color: {{ variant.colour_code }};"></div></td>
+                     <td class="images">
+    {% for image in variant.productvariantimage_set.all %}
+        <img src="{{ image.image.url }}" alt="Variant Image">
+    {% empty %}
+        <p>No images found.</p>
+    {% endfor %}
+</td>
+
+
                         <td class="action-buttons">
-                            <a href="{% url 'product:edit_variant' product_id=product.pk pk=variant.pk %}">Edit</a>
-                            <a href="{% url 'product:delete_variant' product_id=product.pk pk=variant.pk %}">Delete</a>
+                            <a href="{% url 'product:edit_variant' pk=variant.pk %}">Edit</a>
+                            <a href="{% url 'product:add_variant_image' pk=variant.pk %}" class="add-image">Add Image</a>
+                             <a href="{% url 'product:product_variant_delete' pk=variant.pk %}">
+                                {% if variant.variant_status %}
+                                    Deactivate
+                                {% else %}
+                                    Activate
+                                {% endif %}
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}

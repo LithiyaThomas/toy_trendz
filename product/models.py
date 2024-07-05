@@ -1,13 +1,11 @@
 from django.db import models
-from django.urls import reverse
+from django.conf import settings
 from PIL import Image
 from brand.models import Brand
 from category.models import Category
 
+
 # Product Model
-
-
-
 class Product(models.Model):
     product_name = models.CharField(max_length=100, null=False)
     product_description = models.TextField(max_length=5000, null=False)
@@ -16,6 +14,8 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     offer_price = models.DecimalField(max_digits=8, decimal_places=2)
     thumbnail = models.ImageField(upload_to="thumbnail_images", null=True, blank=True)
+    total_reviews = models.IntegerField(default=0)
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -41,20 +41,34 @@ class Product(models.Model):
 
 # Product Variant Model
 class ProductVariant(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
     colour_name = models.CharField(max_length=100, null=False)
     variant_stock = models.PositiveIntegerField(default=0)
-    variant_status = models.BooleanField(default=True)
+    variant_status = models.BooleanField(default=True)  # Optional, if you need an active status
     colour_code = models.CharField(max_length=7, null=False)
+
 
     def __str__(self):
         return f"{self.product.product_name} - {self.colour_name}"
 
 
-# Product Images Model
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="product_images", default='path_to_default_image.jpg')
+# Product Variant Image Model
+class ProductVariantImage(models.Model):
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="product_variant_images", default='path_to_default_image.jpg')
 
     def __str__(self):
-        return f"Image for {self.product.product_name}"
+        return f"Image for {self.variant.product.product_name} - {self.variant.colour_name}"
+
+
+
+#Product Rating
+class Rating(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+    review = models.TextField(blank=True)  # Add this line
+
+    def __str__(self):
+        return f'{self.product.product_name} - {self.rating}'
+
