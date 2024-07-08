@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if view.object %}Update{% else %}Create{% endif %} Product</title>
-   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.css" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet"/>
     <style>
         body {
@@ -156,7 +156,7 @@
     <div class="main-content">
         <div class="container">
             <h1>{% if view.object %}Update{% else %}Create{% endif %} Product</h1>
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" >
                 {% csrf_token %}
                 <label for="product_name">Product Name:</label>
                 <input type="text" name="product_name" id="product_name" value="{% if view.object %}{{ view.object.product_name }}{% endif %}" required>
@@ -184,119 +184,147 @@
                 <label for="offer_price">Offer Price:</label>
                 <input type="number" step="0.01" name="offer_price" id="offer_price" value="{% if view.object and view.object.offer_price > 0 %}{{ view.object.offer_price }}{% endif %}" min="0.01" required>
 
-                <label for="thumbnail">Thumbnail:</label>
-                <input type="file" id="thumbnail" name="thumbnail" accept="image/*" onchange="handleFileSelect(event)">
-                <img id="thumbnail-preview" src="" alt="Image Preview" style="display:none;">
-                <input type="hidden" id="cropped_image" name="cropped_image">
-
-                <div class="modal fade" id="cropperModal" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="cropper-container">
-                                    <img id="image-to-crop" src="" alt="Image to Crop">
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cancelCrop()">Cancel</button>
-                                <button type="button" class="btn btn-primary" onclick="cropImage()">Crop</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label for="thumbnail">Select Images</label>
+                    <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*" multiple required>
+                    <small class="form-text text-muted">Please upload valid image files.</small>
                 </div>
 
-                <button type="submit" id="save-button">Save</button>
+                <button type="submit" id="save-button" id="product-form">Save</button>
             </form>
             <a href="{% url 'product:product_list' %}" class="back-link">Back to Product List</a>
         </div>
     </div>
 
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-<!-- CropperJS JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.js"></script>
+    <!-- Image Preview Section -->
+    <div class="container mt-4" style="width: 100%">
+        <h4 style="padding-top: 5px">Image Preview</h4>
+        <div id="imagePreview" style="width: 100%; overflow: auto; border: 1px solid #ddd; padding: 10px;"></div>
+    </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const thumbnailInput = document.getElementById('thumbnail');
-    const thumbnailPreview = document.getElementById('thumbnail-preview');
-    const cropperModalElement = document.getElementById('cropperModal');
+    <!-- Modal for Cropping Image -->
+    <button type="button" style="display: none" id="openCropperModalBtn" data-bs-toggle="modal" data-bs-target="#cropperModal"></button>
+
+    <div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="width: 100%; height: 100%">
+                    <div id="cropper-container">
+                        <img id="image-to-crop" src="" alt="Image to Crop" style="max-width: 100%; max-height: 500px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="cancelCrop()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="cropImage()">Crop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+   <script>
+    const input = document.getElementById('thumbnail');
+    const previewContainer = document.getElementById('imagePreview');
+    const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'));
+    const openCropperModalBtn = document.getElementById('openCropperModalBtn');
+    const cropperContainer = document.getElementById('cropper-container');
+    const imageToCrop = document.getElementById('image-to-crop');
     let cropper;
+    let fileToUpload;
 
-    function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file.type.startsWith('image/')) {
-            alert("Please select an image file.");
-            return;
-        }
-
+    input.addEventListener('change', () => {
+        const file = input.files[0];
+        previewContainer.innerHTML = '';
         const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('image-to-crop').src = e.target.result;
-            var myModal = new bootstrap.Modal(cropperModalElement);
-            myModal.show();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'thumbnail-preview';
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '200px';
+            img.style.margin = '5px';
+            img.onclick = () => {
+                imageToCrop.src = img.src;
+                cropperModal.show();
+            };
+            previewContainer.appendChild(img);
         };
         reader.readAsDataURL(file);
-    }
-
-    cropperModalElement.addEventListener('shown.bs.modal', function() {
-        const imageToCrop = document.getElementById('image-to-crop');
-        cropper = new Cropper(imageToCrop, {
-            aspectRatio: 1,
-            viewMode: 2,
-            autoCropArea: 1,
-        });
-    });
-
-    cropperModalElement.addEventListener('hidden.bs.modal', function() {
-        if (cropper) {
-            cropper.destroy(); // Destroy the Cropper instance on modal hide
-            cropper = null; // Reset the cropper variable
-        }
+        fileToUpload = file;
     });
 
     function cropImage() {
-        const canvas = cropper.getCroppedCanvas();
-        if (!canvas) {
-            alert("Cannot crop empty image.");
-            return;
+        if (cropper) {
+            cropper.getCroppedCanvas().toBlob((blob) => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(blob);
+                img.className = 'thumbnail-preview';
+                img.style.maxWidth = '200px';
+                img.style.maxHeight = '200px';
+                img.style.margin = '5px';
+                previewContainer.innerHTML = ''; // Clear existing preview
+                previewContainer.appendChild(img);
+
+                fileToUpload = blob;
+
+                cropper.destroy();
+                cropper = null;
+                cropperModal.hide();
+            });
         }
-        canvas.toBlob(function(blob) {
-            const url = URL.createObjectURL(blob);
-            thumbnailPreview.src = url;
-            document.getElementById('cropped_image').value = url;
-            closeModal(); // Close the modal after cropping
-        }, 'image/jpeg');
     }
+
+    document.getElementById('cropperModal').addEventListener('shown.bs.modal', () => {
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: 1,
+            viewMode: 2,
+            autoCropArea: 1
+        });
+    });
+
+    document.getElementById('cropperModal').addEventListener('hidden.bs.modal', () => {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    });
 
     function cancelCrop() {
         if (cropper) {
-            cropper.destroy(); // Destroy the Cropper instance
-            cropper = null; // Reset the cropper variable
+            cropper.destroy();
+            cropper = null;
         }
-        closeModal(); // Hide the modal
+        cropperModal.hide();
     }
 
-    function closeModal() {
-        var myModalEl = document.getElementById('cropperModal');
-        var modalInstance = bootstrap.Modal.getInstance(myModalEl);
-        modalInstance.hide();
-    }
-
-    thumbnailInput.addEventListener('change', handleFileSelect);
-
-    // Ensure the close button in the modal header also works
-    document.querySelector('.close').addEventListener('click', closeModal);
-});
-
+    document.getElementById('product-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        if (fileToUpload) {
+            formData.append('thumbnail', fileToUpload);
+        }
+        fetch(this.action, {
+            method: this.method,
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // handle the response
+            console.log(data);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    });
 </script>
-
 
 </body>
 </html>

@@ -35,6 +35,8 @@ class UserPanelProductListView(ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         return context
+
+
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'userside/product_detail.html'
@@ -61,11 +63,15 @@ class ProductDetailView(DetailView):
         # Fetch variant images
         context['variant_images'] = ProductVariantImage.objects.filter(variant__product=product)
 
+        variants = ProductVariant.objects.filter(product=product)
+        context['variants'] = variants
+
         context['ratings'] = ratings
         context['rating_form'] = RatingForm(initial={'product_id': product.id})
         context['rating_range'] = range(1, 6)  # Assuming you want to display a range of ratings
 
         return context
+
 class AddRatingView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = RatingForm(request.POST)

@@ -131,6 +131,8 @@
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+{% load static %}
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="{% url 'user_panel:user_products' %}">Home</a>
@@ -147,18 +149,18 @@
             <span>&gt;</span>
             <a href="{% url 'user_panel:user_products' %}">Products</a>
             <span>&gt;</span>
-            <span>{{ object.product_name }}</span>
+            <span>{{ product.product_name }}</span>
         </nav>
 
         <div class="row product-container">
             <div class="col-md-6">
                 <div class="main-image-container text-center">
-                    <img id="zoom_mw" src="{% if thumbnail_image %}{{ thumbnail_image }}{% endif %}" data-zoom-image="{% if thumbnail_image %}{{ thumbnail_image }}{% endif %}" alt="{{ object.product_name }}" class="main-product-image">
+                    <img id="zoom_mw" src="{% if thumbnail_image %}{{ thumbnail_image }}{% endif %}" data-zoom-image="{% if thumbnail_image %}{{ thumbnail_image }}{% endif %}" alt="{{ product.product_name }}" class="main-product-image">
                 </div>
                 <div class="side-images">
                     {% if thumbnail_image %}
                         <div class="side-image-container">
-                            <img src="{{ thumbnail_image }}" alt="{{ object.product_name }}" class="side-image" onclick="updateMainImage('{{ thumbnail_image }}')">
+                            <img src="{{ thumbnail_image }}" alt="{{ product.product_name }}" class="side-image" onclick="updateMainImage('{{ thumbnail_image }}')">
                         </div>
                     {% endif %}
                     {% if variant_images %}
@@ -175,14 +177,21 @@
 
             <div class="col-md-6">
                 <div class="product-details">
-                    <h1>{{ object.product_name }}</h1>
-                    <p>{{ object.product_description }}</p>
-                    <p><strong>Category:</strong> {{ object.product_category.category_name }}</p>
-                    <p><strong>Brand:</strong> {{ object.product_brand.name }}</p>
-                    <p><strong>Price:</strong> <span class="price">${{ object.price }}</span></p>
-                    <p><strong>Offer Price:</strong> <span class="price">${{ object.offer_price }}</span></p>
-                    <p class="discount">Discount: {{ object.percentage_discount }}%</p>
-                    <button class="add-to-cart-btn">Add to Cart</button>
+                    <h1>{{ product.product_name }}</h1>
+                    <p>{{ product.product_description }}</p>
+                    <p><strong>Category:</strong> {{ product.product_category.category_name }}</p>
+                    <p><strong>Brand:</strong> {{ product.product_brand.name }}</p>
+                    <p><strong>Price:</strong> <span class="price">${{ product.price }}</span></p>
+                    <p><strong>Offer Price:</strong> <span class="price">${{ product.offer_price }}</span></p>
+                    <div class="variant-selection">
+                        <label for="variant">Select Variant:</label>
+                        <select id="variant" class="form-control">
+                            {% for variant in variants %}
+                                <option value="{{ variant.id }}" data-stock="{{ variant.variant_stock }}">{{ variant.colour_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="add-to-cart-btn" data-product="{{ product.id }}">Add to Cart</button>
                 </div>
                 <div class="delivery-info mt-4">
                     <h2>Delivery</h2>
@@ -249,7 +258,7 @@
                 </p>
             {% elif user.is_authenticated %}
                 <h2>Leave a Rating</h2>
-                <form method="POST" action="{% url 'user_panel:add_rating' object.pk %}">
+                <form method="POST" action="{% url 'user_panel:add_rating' product.pk %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="rating">Rating</label>
@@ -277,10 +286,52 @@
             {% endif %}
         </div>
     </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+    // Add to Cart AJAX
+    $('.add-to-cart-btn').click(function(e) {
+        e.preventDefault();
+        var productId = $(this).data('product');
+        var variantId = $('#variant').val();
+        var quantity = 1; // Example: you can adjust this dynamically based on user input
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+        // Debugging statements
+        console.log("Product ID:", productId);
+        console.log("Variant ID:", variantId);
+
+        if (!variantId) {
+            alert('Variant ID is missing.');
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "cart:add_to_cart" %}',
+            data: {
+                'product': productId,
+                'variant': variantId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    alert('Product added to cart!');
+                    // You can optionally update the cart total or other UI elements
+                } else {
+                    alert('Error: ' + response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error: ' + xhr.responseText);
+            }
+        });
+    });
+    });
+
+    </script>
     <script>
         function updateMainImage(imageUrl) {
             $("#zoom_mw").attr("src", imageUrl).data("zoom-image", imageUrl).elevateZoom({
@@ -304,5 +355,9 @@
             });
         });
     </script>
+
 </body>
 </html>
+
+
+

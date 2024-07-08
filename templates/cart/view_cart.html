@@ -1,0 +1,65 @@
+<!-- view_cart.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <style>
+        /* Your custom styles here */
+        .cart-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Your Cart</h2>
+        <div class="row">
+            <div class="col-md-8">
+                {% for item in cart_items %}
+                <div class="cart-item">
+                    <h4>{{ item.product.product_name }}</h4>
+                    <p>Variant: {{ item.variant.colour_name }}</p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p>Price: ${{ item.variant.product.price }}</p>
+                    <form action="{% url 'cart:update_cart_item' item.id %}" method="post">
+                        {% csrf_token %}
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.variant.variant_stock }}">
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                    <form action="{% url 'cart:remove_cart_item' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                    </form>
+                </div>
+                {% empty %}
+                <p>Your cart is empty.</p>
+                {% endfor %}
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Cart Summary</h5>
+                        <p>Total Items: {{ cart_items.count }}</p>
+                        <p>Total Price: ${{ cart.get_total_price }}</p>
+                        <a href="" class="btn btn-primary">Proceed to Checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js" integrity="sha384-3eS7VRyqiImOJjLHo6PzRjsEJXQYoFZtKx0p4z+O8tcA2EXZCrDteH7nYz0Nqfs" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh/jFcY/A0+0P7PqUst1Kvq2rsUpmJ7f4IH4u" crossorigin="anonymous"></script>
+</body>
+</html>

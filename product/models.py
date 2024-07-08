@@ -46,7 +46,7 @@ class ProductVariant(models.Model):
     variant_stock = models.PositiveIntegerField(default=0)
     variant_status = models.BooleanField(default=True)  # Optional, if you need an active status
     colour_code = models.CharField(max_length=7, null=False)
-
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.product.product_name} - {self.colour_name}"

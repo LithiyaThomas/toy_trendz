@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
@@ -8,8 +8,9 @@ from .models import User
 from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from dateutil.parser import parse
-
-
+from .models import Address
+from .forms import AddressForm
+from django.contrib.auth.decorators import login_required
 # Generate a random OTP
 def generate_otp():
     return random.randint(100000, 999999)
@@ -131,3 +132,61 @@ def resend_otp(request):
 
 def home(request):
     return render(request, 'accounts/home.html')
+
+
+@login_required
+def create_address(request):
+    next_url = request.GET.get('next', None)
+
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            if request.POST.get('is_default') == 'on':
+                address.is_default = True
+                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
+            address.save()
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('home')
+    else:
+        form = AddressForm()
+
+    return render(request, 'accounts/create_address.html', {'form': form})
+
+
+@login_required
+def edit_address(request, address_id):
+    next_url = request.GET.get('next', None)
+
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+
+    if request.method == 'POST':
+        form = AddressForm(request.POST, instance=address)
+        if form.is_valid():
+            address = form.save(commit=False)
+            if request.POST.get('is_default') == 'on':
+                address.is_default = True
+                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
+            address.save()
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('home')
+    else:
+        form = AddressForm(instance=address)
+
+    return render(request, 'accounts/edit_address.html', {'form': form, 'address': address})
+
+
+@login_required
+def delete_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+
+    if request.method == 'POST':
+        address.delete()
+        return redirect('home')
+
+    return render(request, 'accounts/delete_address.html', {'address': address})
