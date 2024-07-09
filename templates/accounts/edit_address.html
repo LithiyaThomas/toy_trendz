@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Address</title>
   <!-- Include Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     body {
       background-color: #f9f9f9;
@@ -59,36 +59,36 @@
     <form method="post">
       {% csrf_token %}
       <div class="form-group">
-        <label for="full_name">Full Name</label>
-        <input type="text" class="form-control" id="full_name" name="full_name" value="{{ address.full_name }}" required>
+        <label for="id_full_name">Full Name</label>
+        <input type="text" class="form-control" id="id_full_name" name="full_name" value="{{ address.full_name }}" required>
       </div>
       <div class="form-group">
-        <label for="phone_number">Phone Number</label>
-        <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ address.phone_number }}" required>
+        <label for="id_phone_number">Phone Number</label>
+        <input type="text" class="form-control" id="id_phone_number" name="phone_number" value="{{ address.phone_number }}" required>
       </div>
       <div class="form-group">
-        <label for="address_line_1">Address Line 1</label>
-        <input type="text" class="form-control" id="address_line_1" name="address_line_1" value="{{ address.address_line_1 }}" required>
+        <label for="id_address_line_1">Address Line 1</label>
+        <input type="text" class="form-control" id="id_address_line_1" name="address_line_1" value="{{ address.address_line_1 }}" required>
       </div>
       <div class="form-group">
-        <label for="address_line_2">Address Line 2</label>
-        <input type="text" class="form-control" id="address_line_2" name="address_line_2" value="{{ address.address_line_2 }}">
+        <label for="id_address_line_2">Address Line 2</label>
+        <input type="text" class="form-control" id="id_address_line_2" name="address_line_2" value="{{ address.address_line_2 }}">
       </div>
       <div class="form-group">
-        <label for="city">City</label>
-        <input type="text" class="form-control" id="city" name="city" value="{{ address.city }}" required>
+        <label for="id_city">City</label>
+        <input type="text" class="form-control" id="id_city" name="city" value="{{ address.city }}" required>
       </div>
       <div class="form-group">
-        <label for="state">State</label>
-        <input type="text" class="form-control" id="state" name="state" value="{{ address.state }}" required>
+        <label for="id_state">State</label>
+        <input type="text" class="form-control" id="id_state" name="state" value="{{ address.state }}" required>
       </div>
       <div class="form-group">
-        <label for="postal_code">Postal Code</label>
-        <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ address.postal_code }}" required>
+        <label for="id_postal_code">Postal Code</label>
+        <input type="text" class="form-control" id="id_postal_code" name="postal_code" value="{{ address.postal_code }}" required>
       </div>
       <div class="form-group">
-        <label for="country">Country</label>
-        <input type="text" class="form-control" id="country" name="country" value="{{ address.country }}" required>
+        <label for="id_country">Country</label>
+        <input type="text" class="form-control" id="id_country" name="country" value="{{ address.country }}" required>
       </div>
       <div class="form-check">
         <input class="form-check-input" type="checkbox" id="id_is_default" name="is_default" {% if address.is_default %}checked{% endif %}>

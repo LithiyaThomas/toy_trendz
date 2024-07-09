@@ -8,4 +8,3 @@ urlpatterns = [
     path('product/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
     path('product/<int:pk>/rate/', AddRatingView.as_view(), name='add_rating'),
 ]
-

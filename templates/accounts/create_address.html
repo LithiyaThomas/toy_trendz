@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Address</title>
+  <title>Create Address</title>
   <!-- Include Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     body {
       background-color: #f9f9f9;
@@ -46,7 +46,7 @@
 </head>
 <body>
   <div class="container mt-5">
-    <h2>Add an Address</h2>
+    <h2>Create Address</h2>
     <form method="post">
       {% csrf_token %}
       <div class="form-group">
@@ -73,7 +73,7 @@
       <div class="form-group">
         <input type="text" class="form-control" id="country" name="country" placeholder="Country" required>
       </div>
-      <button type="submit" class="btn btn-primary ">Continue</button>
+      <button type="submit" class="btn btn-primary">Save Address</button>
     </form>
   </div>
 

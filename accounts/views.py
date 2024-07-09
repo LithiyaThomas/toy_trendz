@@ -11,6 +11,9 @@ from dateutil.parser import parse
 from .models import Address
 from .forms import AddressForm
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+
+
 # Generate a random OTP
 def generate_otp():
     return random.randint(100000, 999999)
@@ -21,7 +24,7 @@ def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
-            email = form.cleaned_data['username']  # Get email from the username field
+            email = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=email, password=password)
             if user is not None:
@@ -131,7 +134,9 @@ def resend_otp(request):
 
 
 def home(request):
+   
     return render(request, 'accounts/home.html')
+
 
 
 @login_required
@@ -156,11 +161,9 @@ def create_address(request):
 
     return render(request, 'accounts/create_address.html', {'form': form})
 
-
 @login_required
 def edit_address(request, address_id):
     next_url = request.GET.get('next', None)
-
     address = get_object_or_404(Address, id=address_id, user=request.user)
 
     if request.method == 'POST':
@@ -180,7 +183,6 @@ def edit_address(request, address_id):
 
     return render(request, 'accounts/edit_address.html', {'form': form, 'address': address})
 
-
 @login_required
 def delete_address(request, address_id):
     address = get_object_or_404(Address, id=address_id, user=request.user)
@@ -190,3 +192,29 @@ def delete_address(request, address_id):
         return redirect('home')
 
     return render(request, 'accounts/delete_address.html', {'address': address})
+
+@login_required
+def select_address(request):
+    template_name = 'accounts/select_address_for_payment.html'
+
+    if request.method == 'GET':
+        addresses = Address.objects.filter(user=request.user)
+        return render(request, template_name, {'addresses': addresses})
+
+    elif request.method == 'POST':
+        selected_address_id = request.POST.get('address')
+
+        if not selected_address_id:
+            messages.error(request, 'Please select an address before proceeding.')
+            return redirect(reverse('select_address'))
+
+        try:
+            selected_address = Address.objects.get(id=selected_address_id, user=request.user)
+
+            return redirect(reverse('proceed_to_payment', kwargs={'address_id': selected_address.id}))  # Adjust the URL name as per your project
+        except Address.DoesNotExist:
+            # Handle case where selected address does not exist for the current user
+            messages.error(request, 'Selected address does not exist.')
+            return redirect(reverse('select_address'))  # Adjust the URL name as per your project
+
+

@@ -76,6 +76,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 # Address Model
 class Address(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20)
     address_line_1 = models.CharField(max_length=100)
     address_line_2 = models.CharField(max_length=100, blank=True, null=True)  # optional field
     city = models.CharField(max_length=50)
@@ -88,7 +90,7 @@ class Address(models.Model):
         verbose_name_plural = "Addresses"
 
     def __str__(self):
-        return f"{self.address_line_1}, {self.city}, {self.country}"
+        return f"{self.full_name}, {self.address_line_1}, {self.city}, {self.country}"
 
 
 class Wallet(models.Model):

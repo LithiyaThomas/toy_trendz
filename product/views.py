@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.edit import View
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
+from django.contrib import messages
 # Product ListView
 class ProductListView(ListView):
     model = Product
@@ -89,12 +90,22 @@ class ProductVariantCreateView(CreateView):
         return reverse_lazy('product:product_variants', kwargs={'product_id': self.kwargs['product_id']})
 
     def form_valid(self, form):
-        form.instance.product_id = self.kwargs['product_id']
+        product_id = self.kwargs['product_id']
+        colour_name = form.cleaned_data['colour_name']
+
+        # Check if the color already exists for this product
+        if ProductVariant.objects.filter(product_id=product_id, colour_name=colour_name).exists():
+            messages.error(self.request, f"The color '{colour_name}' already exists for this product.")
+            return self.form_invalid(form)
+
+        form.instance.product_id = product_id
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_id'] = self.kwargs['product_id']
+        product_id = self.kwargs.get('product_id')
+        product = Product.objects.get(id=product_id)
+        context['product'] = product
         return context
 
 # Product Variant UpdateView
@@ -127,21 +138,6 @@ class ProductVariantListView(ListView):
         context = super().get_context_data(**kwargs)
         context['product'] = Product.objects.get(pk=self.kwargs['product_id'])
         return context
-
-# Product Variant Image CreateView
-# class ProductVariantImageCreateView(View):
-#     template_name = 'product/productvariantimage_form.html'
-#
-#     def get(self, request, pk):
-#         variant = ProductVariant.objects.get(pk=pk)
-#         return render(request, self.template_name, {'variant': variant})
-#
-#     def post(self, request, pk):
-#         variant = ProductVariant.objects.get(pk=pk)
-#         files = request.FILES.getlist('images')
-#         for file in files:
-#             ProductVariantImage.objects.create(variant=variant, image=file)
-#         return redirect(reverse_lazy('product:product_variants', kwargs={'product_id': variant.product.id}))
 
 
 class ProductVariantImageCreateView(View):

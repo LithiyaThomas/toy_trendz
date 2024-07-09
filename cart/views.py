@@ -18,11 +18,6 @@ def add_to_cart(request):
             variant_id = request.POST.get("variant")
             quantity = int(request.POST.get("quantity", 1))  # Default quantity to 1 if not provided
 
-            # Debugging statements to check received data
-            print("Received product_id:", product_id)
-            print("Received variant_id:", variant_id)
-            print("Received quantity:", quantity)
-
             if not variant_id:
                 return JsonResponse({"error": "Variant ID is required"}, status=400)
 

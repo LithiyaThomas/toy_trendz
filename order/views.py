@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Order, OrderItem, Payment
 from django.db import transaction
+from .models import Address
 from collections import defaultdict
 
 
@@ -63,3 +64,13 @@ def cancel_order(request, order_uuid):
             messages.error(request, "Cannot cancel this order.")
 
     return redirect('order_detail', order_uuid=order.uuid)
+
+
+@login_required
+def proceed_to_payment(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+
+    # Handle the payment process here
+    # For example, show the payment form, calculate totals, etc.
+
+    return render(request, 'order/proceed_to_payment.html', {'address': address})

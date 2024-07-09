@@ -1,5 +1,4 @@
-<!-- view_cart.html -->
-
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +18,7 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
+     <div class="container mt-5">
         <h2>Your Cart</h2>
         <div class="row">
             <div class="col-md-8">
@@ -27,8 +26,9 @@
                 <div class="cart-item">
                     <h4>{{ item.product.product_name }}</h4>
                     <p>Variant: {{ item.variant.colour_name }}</p>
-                    <p>Quantity: {{ item.quantity }}</p>
                     <p>Price: ${{ item.variant.product.price }}</p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p><strong>Total Price:</strong> ${{ item.quantity | mul:item.variant.product.price }}</p>
                     <form action="{% url 'cart:update_cart_item' item.id %}" method="post">
                         {% csrf_token %}
                         <label for="quantity">Quantity:</label>
@@ -50,13 +50,12 @@
                         <h5 class="card-title">Cart Summary</h5>
                         <p>Total Items: {{ cart_items.count }}</p>
                         <p>Total Price: ${{ cart.get_total_price }}</p>
-                        <a href="" class="btn btn-primary">Proceed to Checkout</a>
+                        <a href="{% url 'select_address' %}" class="btn btn-primary">Proceed to Checkout</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Include Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js" integrity="sha384-3eS7VRyqiImOJjLHo6PzRjsEJXQYoFZtKx0p4z+O8tcA2EXZCrDteH7nYz0Nqfs" crossorigin="anonymous"></script>

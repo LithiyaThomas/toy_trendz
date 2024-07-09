@@ -1,14 +1,9 @@
-# user_panel/views.py
-from django.views.generic import ListView
-from product.models import Category, Rating,ProductVariantImage
-from django.views.generic import DetailView
+from django.views.generic import ListView, DetailView, View
 from django.shortcuts import redirect, get_object_or_404
-from .forms import RatingForm
-from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Prefetch
-from product.models import Product, ProductVariant
-from django.db.models import Q
+from django.db.models import Prefetch, Q
+from product.models import Product, Category, Rating, ProductVariant, ProductVariantImage
+from .forms import RatingForm
 
 class UserPanelProductListView(ListView):
     model = Product
@@ -18,13 +13,14 @@ class UserPanelProductListView(ListView):
     def get_queryset(self):
         queryset = Product.objects.all().select_related('product_category', 'product_brand') \
             .prefetch_related(
-            Prefetch('productvariant_set', queryset=ProductVariant.objects.prefetch_related('productvariantimage_set')))
+            Prefetch('productvariant_set', queryset=ProductVariant.objects.prefetch_related('productvariantimage_set'))
+        )
 
         query = self.request.GET.get('q')
         category_id = self.request.GET.get('category')
 
         if query:
-            queryset = queryset.filter(Q(product_name__icontains=query) | Q(product_description__icontains=query))
+            queryset = queryset.filter(Q(product_name__icontains=query) | Q(product_description__icontains(query)))
 
         if category_id:
             queryset = queryset.filter(product_category_id=category_id)
@@ -35,7 +31,6 @@ class UserPanelProductListView(ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         return context
-
 
 class ProductDetailView(DetailView):
     model = Product
@@ -63,8 +58,8 @@ class ProductDetailView(DetailView):
         # Fetch variant images
         context['variant_images'] = ProductVariantImage.objects.filter(variant__product=product)
 
-        variants = ProductVariant.objects.filter(product=product)
-        context['variants'] = variants
+        # Fetch product variants
+        context['variants'] = ProductVariant.objects.filter(product=product)
 
         context['ratings'] = ratings
         context['rating_form'] = RatingForm(initial={'product_id': product.id})

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags and CSS links -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Detail: {{ object.product_name }}</title>
@@ -128,10 +129,11 @@
         .zoomWindowContainer {
             z-index: 9999;
         }
+
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-{% load static %}
+
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -191,8 +193,13 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button class="add-to-cart-btn" data-product="{{ product.id }}">Add to Cart</button>
+                    <div class="quantity-selection mt-3">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" class="form-control" value="1" min="1" max="10">
+                    </div>
+                    <button class="add-to-cart-btn mt-3" data-product="{{ product.id }}">Add to Cart</button>
                 </div>
+
                 <div class="delivery-info mt-4">
                     <h2>Delivery</h2>
                     <p>Get it in <span style="color: green;">2-3 days</span>. Usually ships within a day.</p>
@@ -282,69 +289,17 @@
                     <button type="submit" class="custom-submit-btn">Submit</button>
                 </form>
             {% else %}
-                <p><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to leave a rating.</p>
+                <p><a href="{% url 'user_login' %}?next={{ request.path }}">Log in</a> to leave a rating.</p>
             {% endif %}
         </div>
     </div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- JavaScript links -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js" integrity="sha384-3eS7VRyqiImOJjLHo6PzRjsEJXQYoFZtKx0p4z+O8tcA2EXZCrDteH7nYz0Nqfs" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh/jFcY/A0+0P7PqUst1Kvq2rsUpmJ7f4IH4u" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
     <script>
-    $(document).ready(function() {
-    // Add to Cart AJAX
-    $('.add-to-cart-btn').click(function(e) {
-        e.preventDefault();
-        var productId = $(this).data('product');
-        var variantId = $('#variant').val();
-        var quantity = 1; // Example: you can adjust this dynamically based on user input
-
-        // Debugging statements
-        console.log("Product ID:", productId);
-        console.log("Variant ID:", variantId);
-
-        if (!variantId) {
-            alert('Variant ID is missing.');
-            return;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: '{% url "cart:add_to_cart" %}',
-            data: {
-                'product': productId,
-                'variant': variantId,
-                'quantity': quantity,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    alert('Product added to cart!');
-                    // You can optionally update the cart total or other UI elements
-                } else {
-                    alert('Error: ' + response.error);
-                }
-            },
-            error: function(xhr, status, error) {
-                alert('Error: ' + xhr.responseText);
-            }
-        });
-    });
-    });
-
-    </script>
-    <script>
-        function updateMainImage(imageUrl) {
-            $("#zoom_mw").attr("src", imageUrl).data("zoom-image", imageUrl).elevateZoom({
-                zoomType: "lens",
-                lensShape: "round",
-                lensSize: 200,
-                scrollZoom: true,
-                cursor: "crosshair",
-                gallery: 'gallery',
-                galleryActiveClass: 'active'
-            });
-        }
-
+        // Initialize elevateZoom on document ready
         $(document).ready(function() {
             $("#zoom_mw").elevateZoom({
                 zoomType: "lens",
@@ -354,10 +309,48 @@
                 cursor: "crosshair"
             });
         });
+
+        // Function to update main image and re-initialize elevateZoom
+        function updateMainImage(imageUrl) {
+            $("#zoom_mw").attr("src", imageUrl).data("zoom-image", imageUrl);
+            // Re-initialize elevateZoom on the updated image
+            $("#zoom_mw").elevateZoom({
+                zoomType: "lens",
+                lensShape: "round",
+                lensSize: 200,
+                scrollZoom: true,
+                cursor: "crosshair"
+            });
+        }
+
+        // Add to cart functionality using vanilla JavaScript
+        document.querySelector('.add-to-cart-btn').addEventListener('click', function() {
+            var product_id = this.getAttribute('data-product');
+            var variant_id = document.getElementById('variant').value;
+            var quantity = document.getElementById('quantity').value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '{% url "cart:add_to_cart" %}', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}'); // Ensure CSRF token is included
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        alert('Product added to cart successfully!');
+                        // Optionally, update the cart display without reloading the page
+                    } else {
+                        alert(response.message);
+                    }
+                } else {
+                    alert('An error occurred while adding the product to the cart.');
+                }
+            };
+
+            xhr.send('product=' + product_id + '&variant=' + variant_id + '&quantity=' + quantity);
+        });
     </script>
 
 </body>
 </html>
-
-
-
